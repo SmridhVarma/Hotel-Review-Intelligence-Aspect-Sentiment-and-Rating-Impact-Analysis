@@ -1,6 +1,6 @@
 # Hotel Review Intelligence
 
-**BT5153 Applied Machine Learning in Business Analytics — Group 19**
+**BT5153 Applied Machine Learning in Business Analytics — Group 16**
 
 A machine learning system that transforms unstructured hotel reviews into structured aspect-level insights, exposed through a conversational AI agent for hotel owners.
 
