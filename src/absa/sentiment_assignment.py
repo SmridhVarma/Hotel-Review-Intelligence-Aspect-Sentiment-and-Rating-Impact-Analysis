@@ -37,3 +37,40 @@
 #     noise        (int)  : +1 | -1 | 0
 #     food         (int)  : +1 | -1 | 0
 #     room         (int)  : +1 | -1 | 0
+#
+# ─── DOWNSTREAM REQUIREMENTS (for src/agent/ingest.py) ──────────────────────
+#
+# The agent's ChromaDB ingest reads outputs/aspect_sentences.csv directly.
+# For metadata filters in the retriever node to work correctly, the CSV must
+# satisfy the following format contract EXACTLY — mismatches cause silent
+# zero-result retrieval:
+#
+#   hotel_name (str):
+#     Must be the EXACT string from the original data.csv Hotel_Name column.
+#     Do not normalise casing or strip whitespace — the agent fuzzy-matches
+#     user queries against this exact list, so any transformation here breaks
+#     hotel_resolver resolution downstream.
+#
+#   aspect (str):
+#     Must be Title-Cased: "Cleanliness" | "Staff" | "Location" |
+#                          "Noise" | "Food" | "Room"
+#     The retriever filters on aspect using ChromaDB's $in operator. Lowercase
+#     or inconsistent casing means the filter returns no results.
+#
+#   sentiment (str):
+#     Must be converted from the integer representation (+1/-1/0) to:
+#       +1 -> "Positive"
+#        0 -> "Neutral"
+#       -1 -> "Negative"
+#     The retriever uses sentiment for stratified retrieval
+#     (e.g. top-7 Positive + top-7 Negative + top-7 Neutral per neutral query).
+#     Integer values will not match the filter and collapse retrieval to zero.
+#
+#   reviewer_segment (str):
+#     Must be one of exactly: "Business" | "Couple" | "Family" | "Solo" | "Group"
+#     These are the segment filter keys used in ChromaDB metadata queries.
+#
+#   Rows where aspect is null or sentiment is 0 (no match):
+#     These should be EXCLUDED from outputs/aspect_sentences.csv or clearly
+#     flagged — ingest.py will skip them, but including them inflates the
+#     collection with un-filterable noise documents.
