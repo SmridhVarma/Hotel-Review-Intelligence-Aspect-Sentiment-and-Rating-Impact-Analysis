@@ -70,4 +70,4 @@ Source: [Kaggle — 515K Hotel Reviews Data in Europe](https://www.kaggle.com/da
 ## Course
 
 BT5153 Applied Machine Learning in Business Analytics  
-National University of Singapore — Group 19
+National University of Singapore — Group 16
