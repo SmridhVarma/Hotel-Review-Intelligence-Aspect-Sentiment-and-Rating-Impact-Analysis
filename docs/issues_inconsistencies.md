@@ -122,6 +122,41 @@ This ensures the global signal reflects data-rich hotels more than sparse ones.
 
 ---
 
+## Issue 4: Hotel-to-Hotel Comparison Queries — Out of Scope (v1)
+
+**Status:** Intentionally out of scope — document for future work
+
+**The problem:**
+
+A user asking "compare noise levels at Hotel Arena vs Marriott Paris" creates
+an ambiguous routing situation. The query_classifier would set scope=global
+(no single hotel), skipping hotel_resolver entirely, but the query actually
+references two specific hotels. The current pipeline has no mechanism to
+resolve and retrieve evidence for two hotels in a single turn.
+
+**Decision:**
+
+Out of scope for v1. The agent is designed for a single hotel owner querying
+their own property — multi-hotel comparison is a different use case with
+different retrieval logic (two separate ChromaDB queries, side-by-side
+context formatting, comparative response prompting).
+
+**What happens if a user tries it:**
+
+The pipeline defaults to global scope → summary_store → returns the
+`__global__` aggregate SHAP doc → response_generator gives a generic
+"across all hotels" answer, which is not what the user wanted.
+The response will be somewhat useful but not comparative.
+
+**For the report:**
+
+Note this as a v1 limitation in the agent section. Suggested text:
+"The current agent is designed for single-property analysis. Queries
+comparing multiple hotels are handled as global queries and return
+portfolio-level insights rather than property-to-property comparisons."
+
+---
+
 ## Report Reminder: Multi-Turn Memory in Conversational Agents Section
 
 **Status:** Add to report when writing the agent section
