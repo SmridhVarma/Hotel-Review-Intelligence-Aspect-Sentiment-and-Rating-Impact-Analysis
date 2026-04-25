@@ -19,11 +19,13 @@ build/
 data/*.csv
 data/*.json
 data/*.parquet
+notebooks/data.csv
 
 # Large pipeline outputs
 outputs/model_artifacts/*.pkl
 outputs/model_artifacts/*.joblib
 outputs/aspect_sentences.csv
+outputs/clean_reviews_stage1.csv
 outputs/sentences.csv
 outputs/review_features.csv
 

@@ -67,6 +67,20 @@ notebooks/            Exploratory analysis
 
 Source: [Kaggle — 515K Hotel Reviews Data in Europe](https://www.kaggle.com/datasets/jiashenliu/515k-hotel-reviews-data-in-europe)
 
+## EDA Notebook
+
+Exploratory analysis and data cleaning inspection is in `notebooks/EDA_and_Stage1_Text_Preparation.ipynb`.
+
+```bash
+# 1. Place data.csv in the notebooks/ folder
+# 2. Activate the venv and launch Jupyter
+source .venv/Scripts/activate        # Windows Git Bash
+jupyter notebook notebooks/
+```
+
+Open `EDA_and_Stage1_Text_Preparation.ipynb`, select the **BT5153 (venv)** kernel, and run all cells.
+The notebook is read-only exploration — it does not write any output files.
+
 ## Course
 
 BT5153 Applied Machine Learning in Business Analytics  
