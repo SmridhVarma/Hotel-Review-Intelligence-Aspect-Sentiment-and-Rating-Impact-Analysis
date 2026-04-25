@@ -77,7 +77,7 @@ notebooks/            exploratory analysis
 docs/                 internal design documents
 ```
 
-See `architecture.md` for the full pipeline diagram, LangGraph node descriptions, and ChromaDB schema.
+See `docs/architecture.md` for the full pipeline diagram, LangGraph node descriptions, and ChromaDB schema.
 
 ## Dataset
 
