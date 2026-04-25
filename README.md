@@ -52,7 +52,9 @@ notebooks/            exploratory analysis
 
 515k European hotel reviews across 1,492 hotels. Not committed (228MB, over GitHub's limit).
 
-Download `data.csv` from the shared NUS OneDrive link in the group chat, then place it at `data/data.csv`.
+**To set up locally:**
+1. Download `data.csv` from the shared NUS OneDrive link in docs/DETAILS.md
+2. Place it at `data/data.csv`
 
 Source: [Kaggle, 515K Hotel Reviews Data in Europe](https://www.kaggle.com/datasets/jiashenliu/515k-hotel-reviews-data-in-europe)
 
