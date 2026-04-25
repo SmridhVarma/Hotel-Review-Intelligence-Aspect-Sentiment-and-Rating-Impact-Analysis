@@ -1,3 +1,42 @@
+import os
+import sys
+import json
+
+import pandas as pd
+from dotenv import load_dotenv
+
+_SRC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _SRC not in sys.path:
+    sys.path.insert(0, _SRC)
+
+from paths import ASPECT_SENTENCES, SHAP_SUMMARY, CHROMADB_DIR
+
+load_dotenv()
+
+
+def load_aspect_sentences() -> pd.DataFrame:
+    """Load the Stage 3 sentence-level aspect/sentiment table for embedding."""
+    return pd.read_csv(ASPECT_SENTENCES, low_memory=False)
+
+
+def load_shap_summary() -> list:
+    """Load the Stage 4 per-hotel SHAP narrative list."""
+    with open(SHAP_SUMMARY, encoding="utf-8") as f:
+        return json.load(f)
+
+
+# ~836k rows filtered to aspect-matched sentences only — embedded into evidence_store.
+# Columns: review_id, hotel_name, sentence, aspect, sentiment,
+#          reviewer_segment, reviewer_score
+# Available after Stage 3 (sentiment_assignment.py) has been run.
+df_sentences = load_aspect_sentences() if os.path.isfile(ASPECT_SENTENCES) else None
+
+# List of dicts — one per hotel + one "__global__" entry — embedded into summary_store.
+# Keys: hotel_name, aspect_impacts: { cleanliness, staff, location, noise, food, room }
+# Available after Stage 4 (model.py) has been run.
+shap_data = load_shap_summary() if os.path.isfile(SHAP_SUMMARY) else None
+
+
 # =============================================================================
 # ingest.py — ChromaDB Ingestion (Stage 5)
 # =============================================================================

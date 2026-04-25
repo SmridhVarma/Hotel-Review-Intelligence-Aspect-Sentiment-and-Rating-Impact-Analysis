@@ -1,25 +1,33 @@
-# Agent (locked)
+# ── Module C: Agent ──────────────────────────────────────────────────────────
 openai>=1.0.0
 langchain>=0.2.0
 langchain-openai>=0.1.0
 langchain-core>=0.2.0
 langgraph>=0.1.0
 chromadb>=0.5.0
+tiktoken>=0.5.0
 python-dotenv>=1.0.0
+
+# ── Module D: UI ─────────────────────────────────────────────────────────────
 gradio>=4.0.0
 
-# General
+# ── Module A: ABSA ───────────────────────────────────────────────────────────
+nltk>=3.8.0
+gensim>=4.3.0
+scikit-learn>=1.3.0
+
+# ── Module B: Rating Impact ──────────────────────────────────────────────────
+xgboost>=2.0.0
+shap>=0.44.0
+
+# ── Shared / General ─────────────────────────────────────────────────────────
 pandas>=2.0.0
 numpy>=1.24.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+tqdm>=4.65.0
 
-# ABSA (uncomment what you use)
-# spacy>=3.7.0
-# gensim>=4.3.0
-# nltk>=3.8.0
-
-# Rating Impact (uncomment what you use)
-# scikit-learn>=1.3.0
-# xgboost>=2.0.0
-# shap>=0.44.0
-# matplotlib>=3.7.0
-# seaborn>=0.12.0
+# ── Notebooks ────────────────────────────────────────────────────────────────
+jupyter>=1.0.0
+ipykernel>=6.0.0
+openpyxl>=3.1.0
