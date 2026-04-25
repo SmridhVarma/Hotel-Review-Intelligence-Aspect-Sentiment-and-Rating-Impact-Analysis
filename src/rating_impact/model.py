@@ -1,3 +1,36 @@
+import os
+import sys
+
+import pandas as pd
+
+_SRC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _SRC not in sys.path:
+    sys.path.insert(0, _SRC)
+
+from paths import (
+    REVIEW_FEATURES,
+    ARTIFACTS_DIR,
+    LINEAR_MODEL,
+    XGB_MODEL,
+    SHAP_SUMMARY,
+    IMPACT_REPORT,
+)
+
+os.makedirs(ARTIFACTS_DIR, exist_ok=True)
+
+
+def load_review_features() -> pd.DataFrame:
+    """Load the Stage 3 per-review aspect feature matrix."""
+    return pd.read_csv(REVIEW_FEATURES, low_memory=False)
+
+
+# 515,738 rows — one row per review with aspect sentiment scores and target.
+# Columns: review_id, hotel_name, reviewer_score (target),
+#          cleanliness, staff, location, noise, food, room (+1 / -1 / 0)
+# Available after Stage 3 (sentiment_assignment.py) has been run.
+df = load_review_features() if os.path.isfile(REVIEW_FEATURES) else None
+
+
 # model.py — Stage 4: Rating Impact Modeling
 #
 # Purpose:
