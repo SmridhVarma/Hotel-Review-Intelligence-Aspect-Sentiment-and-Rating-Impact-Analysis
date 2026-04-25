@@ -55,6 +55,8 @@ notebooks/            exploratory analysis
 **To set up locally:**
 1. Download `data.csv` from the shared NUS OneDrive link in docs/DETAILS.md
 2. Place it at `data/data.csv`
+3. Create venv with the requirements.txt (i'll add a local_startup batch file to make running easier for evaluation later on)
+4. Additionally, in the OneDrive -> outputs are classified by stage, copy all or relevant outputs and place them in the outputs folder - path issues have been resolved and there are load_X() functions to make loading df's easier.
 
 Source: [Kaggle, 515K Hotel Reviews Data in Europe](https://www.kaggle.com/datasets/jiashenliu/515k-hotel-reviews-data-in-europe)
 
@@ -68,7 +70,7 @@ source .venv/Scripts/activate   # Windows Git Bash
 jupyter notebook notebooks/
 ```
 
-Select the **BT5153 (venv)** kernel and run all cells.
+Select the **BT5153 (venv)** (or your local venv name) as kernel and run all cells.
 
 ## Course
 
