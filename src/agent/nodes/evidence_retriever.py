@@ -109,8 +109,11 @@ def evidence_retriever(state: AgentState) -> dict:
     direction  = state.get("query_direction", "neutral")
 
     if direction == "neutral" and len(embeddings) >= 3:
-        # Stratified retrieval: one query per sentiment pole
-        sentiment_poles = ["Positive", "Negative", "Neutral"]
+        # Stratified retrieval: positive pole, negative pole, unfiltered pole.
+        # The data has only Positive/Negative sentiments — the third hypothetical
+        # (neutral-tone) queries without a sentiment filter so it can surface any
+        # highly-relevant chunk regardless of polarity.
+        sentiment_poles = ["Positive", "Negative", None]
         seen_texts: set[str] = set()
         chunks: list[dict] = []
 

@@ -232,10 +232,16 @@ def ingest_summary_store(
 
         texts.append(narrative)
         ids.append(f"sum_{hotel_name}")
+        # Prefer the insufficient_data flag set by model.py (threshold=100 reviews)
+        # rather than recomputing; fall back to MIN_REVIEWS for entries without it.
+        insuf = entry.get(
+            "insufficient_data",
+            hotel_name != "__global__" and review_count < MIN_REVIEWS,
+        )
         metadatas.append({
-            "hotel_name":       hotel_name,
-            "review_count":     int(review_count),
-            "insufficient_data": hotel_name != "__global__" and review_count < MIN_REVIEWS,
+            "hotel_name":        hotel_name,
+            "review_count":      int(review_count),
+            "insufficient_data": bool(insuf),
         })
 
     print("  Generating embeddings...")
