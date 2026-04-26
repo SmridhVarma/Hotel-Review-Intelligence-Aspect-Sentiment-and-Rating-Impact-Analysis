@@ -37,25 +37,8 @@
       "immaculate"
     ],
     "staff": [
-      "room",
       "staff",
-      "check",
-      "didn",
-      "like",
       "reception",
-      "booking",
-      "wifi",
-      "asked",
-      "wasn",
-      "morning",
-      "pool",
-      "booked",
-      "people",
-      "pay",
-      "early",
-      "door",
-      "rooms",
-      "don",
       "service",
       "receptionist",
       "concierge",
@@ -135,26 +118,10 @@
       "snoring"
     ],
     "food": [
-      "staff",
-      "service",
       "bar",
       "breakfast",
-      "lovely",
-      "room",
       "restaurant",
       "food",
-      "amazing",
-      "excellent",
-      "loved",
-      "best",
-      "view",
-      "fantastic",
-      "free",
-      "welcoming",
-      "beautiful",
-      "wonderful",
-      "area",
-      "reception",
       "buffet",
       "menu",
       "meal",
@@ -383,6 +350,55 @@
       "noise": {
         "previous_size": 34,
         "new_size": 30
+      }
+    },
+    "post_processing_2": {
+      "applied_at": "2026-04-26T06:03:18.033096+00:00",
+      "rationale": "Staff (LDA Topic 2) contained generic booking/interaction noise words including 'room'/'rooms', which caused keyword ownership conflicts — staff claimed 'room' before the room aspect, mis-classifying room-only sentences as staff. Food (LDA Topic 3) contained generic praise vocabulary with no food-specific signal. Both aspects stripped to seed-derived keywords only.",
+      "staff": {
+        "previous_size": 34,
+        "new_size": 17,
+        "removed": [
+          "room",
+          "check",
+          "didn",
+          "like",
+          "booking",
+          "wifi",
+          "asked",
+          "wasn",
+          "morning",
+          "pool",
+          "booked",
+          "people",
+          "pay",
+          "early",
+          "door",
+          "rooms",
+          "don"
+        ]
+      },
+      "food": {
+        "previous_size": 35,
+        "new_size": 19,
+        "removed": [
+          "staff",
+          "service",
+          "lovely",
+          "room",
+          "amazing",
+          "excellent",
+          "loved",
+          "best",
+          "view",
+          "fantastic",
+          "free",
+          "welcoming",
+          "beautiful",
+          "wonderful",
+          "area",
+          "reception"
+        ]
       }
     }
   }
