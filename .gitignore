@@ -51,3 +51,7 @@ presentation/
 
 # Internal planning docs
 docs/superpowers/
+
+outputs/_lda_cache/
+outputs/*.backup.json
+outputs/sample.csv
