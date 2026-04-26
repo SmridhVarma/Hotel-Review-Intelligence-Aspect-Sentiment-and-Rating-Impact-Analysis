@@ -1,24 +1,43 @@
-# =============================================================================
-# state_manager.py — Node: Conversation State Persistence
-# =============================================================================
-# Purpose:
-#   Last node in the DAG before END. Appends the current turn to
-#   conversation_history and updates last_topic. If query_type has changed
-#   from last_topic (topic shift detected), clears hyde_embedding and
-#   retrieved_chunks to force fresh retrieval on the next turn.
-#
-# Reads from state:
-#   query                (str)        current user message
-#   response             (str)        generated response
-#   query_type           (str)        current query classification
-#   last_topic           (str | None) previous query_type
-#   hyde_embedding       (list[float] | None)
-#   retrieved_chunks     (list[dict])
-#   conversation_history (list[dict])
-#
-# Writes to state:
-#   conversation_history  (list[dict])  appended with current turn
-#   last_topic            (str)         set to current query_type
-#   hyde_embedding        (None)        cleared on topic shift
-#   retrieved_chunks      ([])          cleared on topic shift
-# =============================================================================
+"""
+Node: state_manager
+
+Last node in the DAG before END. Appends the current turn to
+conversation_history and updates last_topic. On topic shift (query_type
+changed from previous turn), clears the retrieval cache so the next query
+starts fresh.
+
+Reads:  query, response, query_type, last_topic, hyde_embeddings,
+        hyde_hypotheticals, retrieved_chunks
+Writes: conversation_history (appended), last_topic,
+        hyde_embeddings/hypotheticals (cleared on topic shift),
+        retrieved_chunks (cleared on topic shift)
+"""
+
+from __future__ import annotations
+
+from agent.state import AgentState
+
+
+def state_manager(state: AgentState) -> dict:
+    current_topic  = state.get("query_type", "evidence")
+    previous_topic = state.get("last_topic")
+    topic_shift    = previous_topic is not None and previous_topic != current_topic
+
+    new_turn = {
+        "query":    state.get("query", ""),
+        "response": state.get("response", ""),
+        "hotel":    state.get("hotel_name", "__global__"),
+        "topic":    current_topic,
+    }
+
+    update: dict = {
+        "conversation_history": [new_turn],   # operator.add appends this
+        "last_topic":           current_topic,
+    }
+
+    if topic_shift:
+        update["hyde_hypotheticals"] = []
+        update["hyde_embeddings"]    = []
+        update["retrieved_chunks"]   = []
+
+    return update

@@ -1,14 +1,68 @@
-# =============================================================================
-# summary_retriever.py — Node: Summary Store Retrieval
-# =============================================================================
-# Purpose:
-#   Retrieves the SHAP-based impact summary for the selected hotel (or
-#   "__global__" if no hotel is selected) from the ChromaDB summary_store.
-#   Used for prioritization queries ("which issue should we fix first?").
-#
-# Reads from state:
-#   hotel_name  (str)  filters summary_store by hotel_name metadata
-#
-# Writes to state:
-#   summary_context  (str | None)  retrieved summary text, None if not found
-# =============================================================================
+"""
+Node: summary_retriever
+
+Retrieves the SHAP-based impact narrative for the selected hotel (or
+__global__) from ChromaDB summary_store. Used for prioritization queries.
+
+Uses collection.get() — no embedding needed, just a metadata filter lookup.
+
+Reads:  hotel_name
+Writes: summary_context, insufficient_data
+"""
+
+from __future__ import annotations
+
+import os
+import sys
+
+_SRC = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if _SRC not in sys.path:
+    sys.path.insert(0, _SRC)
+
+from agent.state import AgentState
+from paths import CHROMADB_DIR
+
+CHROMA_SUMMARY = "summary_store"
+
+_chroma_client = None
+_collection    = None
+
+
+def _get_collection():
+    global _chroma_client, _collection
+    if _collection is not None:
+        return _collection
+    import chromadb
+    _chroma_client = chromadb.PersistentClient(path=str(CHROMADB_DIR))
+    _collection = _chroma_client.get_collection(CHROMA_SUMMARY)
+    return _collection
+
+
+def summary_retriever(state: AgentState) -> dict:
+    hotel_name = state.get("hotel_name", "__global__")
+    collection = _get_collection()
+
+    results = collection.get(
+        where={"hotel_name": {"$eq": hotel_name}},
+        include=["documents", "metadatas"],
+    )
+
+    if not results["documents"]:
+        # Fall back to global if hotel-specific entry not found
+        if hotel_name != "__global__":
+            results = collection.get(
+                where={"hotel_name": {"$eq": "__global__"}},
+                include=["documents", "metadatas"],
+            )
+
+    if not results["documents"]:
+        return {"summary_context": None, "insufficient_data": False}
+
+    doc  = results["documents"][0]
+    meta = results["metadatas"][0]
+    insufficient = bool(meta.get("insufficient_data", False))
+
+    return {
+        "summary_context":  doc,
+        "insufficient_data": insufficient,
+    }
