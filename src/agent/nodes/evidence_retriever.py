@@ -26,7 +26,7 @@ if _SRC not in sys.path:
     sys.path.insert(0, _SRC)
 
 from agent.state import AgentState
-from paths import CHROMADB_DIR
+from paths import CHROMADB_DIR, DEMO_VECTORS_DIR
 
 CHROMA_EVIDENCE   = "evidence_store"
 DIRECTIONAL_K     = 20    # results for a directional query
@@ -41,9 +41,14 @@ def _get_collection():
     global _chroma_client, _collection
     if _collection is not None:
         return _collection
-    import chromadb
-    _chroma_client = chromadb.PersistentClient(path=str(CHROMADB_DIR))
-    _collection = _chroma_client.get_collection(CHROMA_EVIDENCE)
+    try:
+        import chromadb
+        _chroma_client = chromadb.PersistentClient(path=str(CHROMADB_DIR))
+        _collection = _chroma_client.get_collection(CHROMA_EVIDENCE)
+    except (ImportError, Exception):
+        from agent.npy_store import NpyClient
+        _chroma_client = NpyClient(path=str(DEMO_VECTORS_DIR))
+        _collection = _chroma_client.get_collection(CHROMA_EVIDENCE)
     return _collection
 
 

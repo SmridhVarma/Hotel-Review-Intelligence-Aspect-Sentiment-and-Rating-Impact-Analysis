@@ -42,4 +42,5 @@ EVALUATION_REPORT = os.path.join(OUTPUT_DIR, "evaluation_report.json")
 
 # ── Stage 5 inputs  (ingest.py) ──────────────────────────────────────────────
 # ASPECT_SENTENCES and SHAP_SUMMARY above — reused by agent ingest
-CHROMADB_DIR = os.path.join(PROJECT_ROOT, "chromadb")
+CHROMADB_DIR      = os.path.join(PROJECT_ROOT, "chromadb")
+DEMO_VECTORS_DIR  = os.path.join(PROJECT_ROOT, "demo_vectors")  # numpy fallback for HF Spaces
