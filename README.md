@@ -8,6 +8,26 @@ Turns 515k unstructured European hotel reviews into aspect-level sentiment signa
 
 ---
 
+## Live demo
+
+**[smridhv-conversational-hotel-review-intelligence.hf.space](https://smridhv-conversational-hotel-review-intelligence.hf.space)**
+
+A trimmed demo is deployed on Hugging Face Spaces for evaluation. No setup required — open the link and start querying.
+
+**Demo limitations vs. the full system:**
+
+- Covers 5 hotels only (Britannia International, Strand Palace, Park Plaza Westminster Bridge, Copthorne Tara, Grand Royale London Hyde Park)
+- Citations panel shows up to 5 sources per response, not the full retrieval set
+- Vector store uses a numpy-backed cosine similarity engine rather than ChromaDB, to avoid Rust/C++ compilation on the HF build environment
+- Multi-turn follow-up is slightly limited — HuggingFace Spaces manages conversation history differently from the local setup, so context carry-over across turns may be less reliable than the full local deployment
+
+**Access notes:**
+
+- Allow 1–2 minutes on first load while the Space cold-starts
+- Some corporate networks and university proxies block AWS WAF telemetry, which HuggingFace uses for bot protection. If the page loads blank, switch to a personal hotspot — the Space itself is running fine
+
+---
+
 ## What it does
 
 Five stages, end to end:
