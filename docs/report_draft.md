@@ -1,111 +1,84 @@
 // ============================================================
-// BT5153 — Hotel Review Intelligence: Aspect Sentiment and Rating Impact Analysis  |  AY 2025/2026
+// BT5153 — Hotel Review Intelligence: Aspect Sentiment and Rating Impact Analysis
+// AY 2025/2026 | Group 16
 // ============================================================
 
-// ── Page & typography setup ─────────────────────────────────
-#set document(
-  title:  "Hotel Review Intelligence",
-  author: ("Smridh Varma", "Siddarth Mahesh", "add ur names here")
+#import "@preview/lucky-icml:0.7.0": icml2025
+#import "@preview/fletcher:0.5.5": diagram, node, edge
+
+// ── Authors & affiliations ───────────────────────────────────
+#let affls = (
+  // Positional format: (display-name, city, country)
+  nus: ("NUS BT5153 Applied ML for Business Analytics — Group 16", "Singapore", "Singapore"),
 )
 
-#import "@preview/fletcher:0.5.5" as fletcher: diagram, node, edge
-
-#set text(font: "Times New Roman", size: 10pt, lang: "en")
-#set page(
-  paper:   "a4",
-  margin:  (top: 1.5cm, bottom: 1.5cm, left: 2cm, right: 1.8cm),
-  numbering: "1",
+#let authors = (
+  (name: "Smridh Varma",     affl: ("nus",), email: "smridhv@gmail.com"),
+  (name: "Siddarth Mahesh",  affl: ("nus",), email: "[TODO]@u.nus.edu"),
+  (name: "Mark Dodoo",       affl: ("nus",), email: "[TODO]@u.nus.edu"),
+  (name: "Frankie Yang Lin", affl: ("nus",), email: "[TODO]@u.nus.edu"),
+  (name: "Lu Qianqian",      affl: ("nus",), email: "[TODO]@u.nus.edu"),
+  (name: "Wang Mengyu",      affl: ("nus",), email: "[TODO]@u.nus.edu"),
 )
-#set par(justify: true, leading: 0.6em, spacing: 0.75em)
 
-// ── Heading styles ───────────────────────────────────────────
-#set heading(numbering: "1.")
-#show heading.where(level: 1): it => {
-  v(0.9em)
-  text(weight: "bold", size: 12pt, it)
-  v(0.3em)
-}
-#show heading.where(level: 2): it => {
-  v(0.6em)
-  text(weight: "bold", size: 11pt, it)
-  v(0.2em)
-}
-
-// ── Code / monospace style ───────────────────────────────────
+// ── Custom overrides (on top of template defaults) ───────────
 #show raw.where(block: false): it => box(
-  fill:   luma(235),
-  inset:  (x: 3pt, y: 1pt),
-  radius: 2pt,
+  fill:    luma(235),
+  inset:   (x: 3pt, y: 1pt),
+  radius:  2pt,
   baseline: 20%,
   text(size: 0.9em, it)
 )
 #show raw.where(block: true): it => block(
-  fill:    luma(245),
-  inset:   (x: 8pt, y: 5pt),
-  radius:  3pt,
-  width:   100%,
+  fill:   luma(245),
+  inset:  (x: 8pt, y: 5pt),
+  radius: 3pt,
+  width:  100%,
   text(size: 0.88em, it)
 )
-
-// ── Table style ──────────────────────────────────────────────
 #set table(
-  stroke:      (x, y) => if y == 0 { (bottom: 0.8pt + black) } else { (bottom: 0.3pt + luma(200)) },
-  fill:        (_, y) => if calc.odd(y) { luma(250) } else { white },
-  inset:       (x: 4pt, y: 3pt),
+  stroke: (x, y) => if y == 0 { (bottom: 0.8pt + black) } else { (bottom: 0.3pt + luma(200)) },
+  fill:   (_, y) => if calc.odd(y) { luma(250) } else { white },
+  inset:  (x: 4pt, y: 3pt),
 )
 #show table.cell.where(y: 0): set text(weight: "bold", size: 9.5pt)
 #show table.cell: set text(size: 9pt)
 #set figure(gap: 0.6em)
 #show figure.caption: set text(size: 9pt, style: "italic")
 
-// To add a figure: #figure(image("file.png", width: 80%), caption: [Caption]) <label>
+// ── Template ─────────────────────────────────────────────────
+#show: icml2025.with(
+  title: [Conversational Hotel Review Intelligence with Aspect Sentiment and Rating Impact Analysis],
+  authors: (authors, affls),
+  keywords: ("Aspect-Based Sentiment Analysis", "SHAP", "LangGraph", "RAG", "Hotel Reviews"),
+  abstract: [
+    Hotels receive more reviews than any team can read, yet the insights managers actually need — which service problems are driving scores down, which strengths are worth protecting — are buried in that text. This report presents a three-stage pipeline that turns 515,738 European hotel reviews across 1,492 properties into structured operational intelligence. The first stage applies Aspect-Based Sentiment Analysis (ABSA) @pontiki2014semeval to label sentences across six service dimensions: Cleanliness, Staff, Location, Noise, Food, and Room. The second stage fits a regression model on those labels and uses SHAP decomposition @lundberg2017unified to rank which aspects most drive guest scores, both globally and per property. The third stage wraps these outputs in a stateful Retrieval-Augmented Generation (RAG) @lewis2020rag agent built on LangGraph @langgraph, so hotel operators can ask questions in plain language and get answers grounded in real review evidence. The agent uses Hypothetical Document Embeddings (HyDE) @gao2022precise for retrieval and supports queries filtered by reviewer segment. Evaluation results are in Section 4.
+  ],
+  bibliography: bibliography("refs.bib", style: "ieee"),
+  header: [Hotel Review Intelligence — Aspect Sentiment and Rating Impact Analysis],
+  appendix: [
+    #figure(image("figures/hotel_review_count.png", width: 88%), caption: [Reviewer count distribution and CDF across 1,492 hotels.])
 
-// ============================================================
-// TITLE PAGE
-// ============================================================
-#align(center)[
-  #v(1.5cm)
-  #image("figures/nus_logo.jpg")
-  #v(1.5cm)
-  #text(size: 20pt, weight: "bold")[Hotel Review Intelligence: Aspect Sentiment and Rating Impact Analysis]
-  #v(0.5em)
-  #text(size: 12pt, style: "italic")[
-    A Multi-Agent LangGraph Pipeline for Automated Hotel Review Analysis
-  ]
-  #v(1.5em)
-  #line(length: 60%, stroke: 0.5pt + luma(160))
-  #v(1em)
-  #text(size: 10.5pt)[
-    BT5153 Applied Machine Learning for Business Analytics \
-    National University of Singapore
-    \ AY 2025/2026
-  ]
-  #v(1.8em)
-  #text(size: 10pt)[
-    *Group 16:* \
-    Smridh Varma (A0318634B) \
-    Siddarth Mahesh (A0318775N)\
-    Mark Dodoo (A0319136E) \
-    Frankie Yang Lin () \
-    LU QIANQIAN () \
-    WANG MENGYU (A0222618J) \
-  ]
-]
-// ============================================================
-// ABSTRACT
-// ============================================================
-#pagebreak()
+    #figure(image("figures/review_date_dist.png", width: 88%), caption: [Review date distribution (Aug 2015 -- Aug 2017).])
 
-#align(center)[
-  #v(0.5em)
-  #text(size: 11pt, weight: "bold")[Abstract]
-  #v(0.3em)
-]
+    #figure(image("figures/segment_dist.png", width: 88%), caption: [Sentence distribution by reviewer segment.])
 
-Hotels receive more reviews than any team can read, yet the insights managers actually need — which service problems are driving scores down, which strengths are worth protecting — are buried in that text. This report presents a three-stage pipeline that turns 515,738 European hotel reviews across 1,492 properties into structured operational intelligence. The first stage applies Aspect-Based Sentiment Analysis (ABSA) @pontiki2014semeval to label sentences across six service dimensions: Cleanliness, Staff, Location, Noise, Food, and Room. The second stage fits a regression model on those labels and uses SHAP decomposition @lundberg2017unified to rank which aspects most drive guest scores, both globally and per property. The third stage wraps these outputs in a stateful Retrieval-Augmented Generation (RAG) @lewis2020rag agent built on LangGraph @langgraph, so hotel operators can ask questions in plain language and get answers grounded in real review evidence. The agent uses Hypothetical Document Embeddings (HyDE) @gao2022precise for retrieval and supports queries filtered by reviewer segment. Evaluation results are in Section 4.
+    #figure(image("figures/sentiment_by_aspect.png", width: 88%), caption: [Sentiment polarity by aspect across the full corpus.])
 
-#v(0.5em)
-#line(length: 100%, stroke: 0.4pt + luma(200))
+    == AI Usage Declaration
+
+    In accordance with NUS academic integrity guidelines for BT5153, the team declares the following use of generative AI tools during this project:
+
+    - *Code scaffolding:* Claude Code was used to generate boilerplate LangGraph node structure, `requirements.txt` content, and script templates. All generated code was reviewed, modified to project requirements, and validated by team members.
+
+    - *Debugging assistance:* Claude Code was used to diagnose issues and advise on feature engineering design. Findings were independently verified against the codebase.
+
+    - *Content drafting:* Gemini 2.5 Pro / GPT-4o / Claude Sonnet 4.6 was used to inform initial document drafts. Final wording was reviewed and refined by the team for technical accuracy and BT5153 rubric alignment.
+
+    - *Human-only contributions:* Model selection rationale, feature engineering design decisions, architectural choices, test case design, and all critical reflection content reflect team analysis and were not generated by AI tools.
+  ],
+  accepted: true,
+)
 
 // ============================================================
 // 1. INTRODUCTION
@@ -125,10 +98,22 @@ The system makes three contributions:
 + *Interpretable rating impact ranking* using SHAP value decomposition @lundberg2017unified over a trained regression model, producing per-hotel and global rankings of which aspects most drive guest scores.
 + *A stateful RAG conversational agent* @lewis2020rag built on LangGraph @langgraph, supporting evidence queries, prioritisation queries, mismatch detection, and reviewer-segment-specific queries via HyDE-enhanced @gao2022precise retrieval over a ChromaDB vector store.
 
-The remainder of this report is structured as follows: Section 2 describes the dataset; Section 3 details the methodology across all pipeline stages; Section 4 presents evaluation results; Section 5 discusses limitations and future work; Section 6 concludes.
+The remainder of this report is structured as follows: Section 2 reviews related work; Section 3 describes the dataset; Section 4 details the methodology across all pipeline stages; Section 5 presents evaluation results; Section 6 discusses limitations and future work; Section 7 concludes.
 
 // ============================================================
-// 2. DATASET
+// 2. RELATED WORK
+// ============================================================
+
+= Related Work
+
+*Aspect-Based Sentiment Analysis.* ABSA has been a well-studied problem since the SemEval shared tasks @pontiki2014semeval established standard benchmarks for aspect detection and opinion polarity classification. The task separates into two subtasks: identifying which service dimension a sentence addresses, and determining the expressed sentiment. Supervised approaches using transformer-based models achieve high accuracy but require labelled training data — expensive at scale. This project trades some recall for zero annotation overhead by pairing LDA-derived vocabulary @blei2003latent with a deterministic source-field polarity signal, which is feasible specifically because the dataset provides pre-separated positive and negative review fields.
+
+*Interpretable Rating Models.* Prior work on review-based rating prediction typically optimises predictive accuracy, leaving the contribution of individual features opaque. SHAP @lundberg2017unified provides a theoretically grounded decomposition of model output into per-feature contributions based on Shapley values from cooperative game theory. Applied to a regression model trained on aspect sentiment features, SHAP converts a black-box prediction into an operationally legible ranking: a per-hotel statement that "staff sentiment accounts for +0.036 rating points on average" is directly actionable for management. XGBoost @chen2016xgboost is used as the primary model because tree-ensemble SHAP values are computed exactly via the TreeExplainer algorithm, avoiding the approximations required for other model families.
+
+*Retrieval-Augmented Generation for Domain Q&A.* RAG @lewis2020rag grounds LLM responses in retrieved documents, reducing hallucination by conditioning generation on verified evidence rather than parametric memory. HyDE @gao2022precise extends retrieval precision by generating a hypothetical document from the query before searching, closing the distributional gap between short user queries and the dense language of the indexed corpus. LangGraph @langgraph provides stateful orchestration, enabling multi-turn sessions where prior context informs subsequent retrieval. The combination — HyDE retrieval over a structured evidence store with SHAP summaries as a second retrieval tier — addresses a gap in prior hospitality analytics tools, which typically produce static dashboards rather than interactive, evidence-grounded interfaces.
+
+// ============================================================
+// 3. DATASET
 // ============================================================
 
 = Dataset
@@ -153,24 +138,8 @@ This project utilises the European Hotel Reviews dataset @kaggle515k, comprising
 
 The pre-separation of positive and negative review fields is the defining property that enables the labelling approach used in this project. Rather than requiring manual sentiment annotation at sentence level, the source field is treated as a deterministic polarity label for each extracted sentence. Reviews containing the placeholder strings `"No Negative"` or `"No Positive"` are filtered during preprocessing. The reviewer score distribution is left-skewed, consistent with the well-documented positivity bias in voluntary online review platforms, which motivates the use of aspect-level decomposition rather than aggregate score analysis alone.
 
-#figure(
-  block(
-    width: 100%,
-    height: 4.5cm,
-    fill: luma(240),
-    stroke: 0.4pt + luma(180),
-    radius: 3pt,
-    inset: 10pt,
-    align(center + horizon)[
-      #text(size: 8.5pt, fill: luma(130), style: "italic")[
-        _Figure suggestion: Histogram of `Reviewer_Score` (0--10) showing left-skewed distribution_ \
-        #v(0.4em)
-        Replace with: `#figure(image("figures/score_dist.png", width: 70%), caption: [...])`
-      ]
-    ]
-  ),
-  caption: [Distribution of reviewer scores (0--10) across 515,738 reviews.]
-) <fig:score_dist>
+#figure(image("figures/score_dist.png", width: 70%), caption: [Distribution of reviewer scores (0--10) across 515,738 reviews.])
+<fig:score_dist>
 
 // ============================================================
 // 3. METHODOLOGY
@@ -186,7 +155,7 @@ The pipeline consists of five sequential stages: text preparation, aspect extrac
     node-fill: luma(245),
     node-corner-radius: 3pt,
     node-inset: 6pt,
-    spacing: (1.8em, 1.6em),
+    spacing: (2em, 2.2em),
     node((0,0), [#text(size:8pt)[`data.csv`]], name: <data>),
     node((1,0), [#text(size:8pt)[*Stage 1*\ Preprocess]], name: <s1>),
     node((2,0), [#text(size:8pt)[*Stage 2*\ Aspect\ Extraction]], name: <s2>),
@@ -237,7 +206,7 @@ For each segmented sentence, the relevant aspect is detected through keyword mat
 
 == Stage 4: Rating Impact Modelling
 
-Structured feature variables are constructed for each review by converting assigned aspect sentiments into numeric values, forming a machine learning training dataset. A regression model is trained to predict the overall reviewer score as a function of the extracted aspect features, and performance is evaluated using RMSE, MAE, and $R^2$. Linear Regression is the interpretable baseline; XGBoost captures non-linear interactions between aspects. SHAP values @lundberg2017unified are applied to determine which hotel aspects most strongly influence overall guest ratings. Scores are computed both globally across all hotels and locally per hotel by running the global model on each hotel's review subset, yielding a consistent per-hotel and global impact ranking.
+Structured feature variables are constructed for each review by converting assigned aspect sentiments into numeric values, forming a machine learning training dataset. A regression model is trained to predict the overall reviewer score as a function of the extracted aspect features, and performance is evaluated using RMSE, MAE, and $R^2$. Linear Regression is the interpretable baseline; XGBoost @chen2016xgboost captures non-linear interactions between aspects. SHAP values @lundberg2017unified are applied to determine which hotel aspects most strongly influence overall guest ratings. Scores are computed both globally across all hotels and locally per hotel by running the global model on each hotel's review subset, yielding a consistent per-hotel and global impact ranking.
 
 == Stage 5: Conversational Agent <sec:agent>
 
@@ -279,7 +248,7 @@ The agent is implemented as a LangGraph `StateGraph` @langgraph over a shared `C
     node-fill: luma(245),
     node-corner-radius: 3pt,
     node-inset: 5pt,
-    spacing: (3em, 1.8em),
+    spacing: (1em, 1.8em),
     node((1,0), [#text(size:8pt)[`query_classifier`]],   name: <qc>),
     node((1,1), [#text(size:8pt)[`segment_filter`]],     name: <sf>),
     node((0,2), [#text(size:8pt)[`hyde_expander`]],      name: <hyde>),
@@ -337,7 +306,6 @@ Two mechanisms work together. `MemorySaver` checkpoints the full `AgentState` be
 
 If the user explicitly names a different hotel, `query_classifier` overwrites `hotel_name`; otherwise the prior context holds. Switching hotels via the UI dropdown generates a new `thread_id` and clears state, preventing context from one property contaminating queries about another. `MemorySaver` is in-RAM only; state does not survive server restart. A persistent checkpointer (`SqliteSaver` or Redis-backed) would be needed for production deployment.
 
-
 === Retrieval Strategy and Deduplication
 
 Evidence retrieval follows one of two paths depending on query direction. For directional queries (those explicitly positive or negative), a single HyDE hypothetical is generated and the top $k = 20$ results are retrieved with a sentiment metadata filter matching the stated direction. For neutral queries, three hypotheticals are generated concurrently in an `asyncio.gather` call: one positive-toned, one negative-toned, and one without a sentiment constraint. Each yields the top $k = 7$ results independently.
@@ -356,24 +324,7 @@ Hotel name resolution uses fuzzy string matching (RapidFuzz `fuzz.ratio`, thresh
 
 Sentiment labels are derived deterministically from source field polarity; evaluation therefore focuses on aspect assignment quality, specifically whether the correct aspect is matched for each sentence. A validation set is constructed by manually labelling a stratified random sample of [_N_] sentences. Performance is measured using Accuracy, Precision, Recall, and F1 as specified in the project success criteria @pontiki2014semeval.
 
-#figure(
-  block(
-    width: 100%,
-    height: 4cm,
-    fill: luma(240),
-    stroke: 0.4pt + luma(180),
-    radius: 3pt,
-    inset: 10pt,
-    align(center + horizon)[
-      #text(size: 8.5pt, fill: luma(130), style: "italic")[
-        _Figure suggestion: Horizontal bar chart of sentence count per aspect across the full corpus_ \
-        #v(0.4em)
-        Replace with: `#figure(image("figures/aspect_freq.png", width: 72%), caption: [...])`
-      ]
-    ]
-  ),
-  caption: [Sentence-level mention frequency per aspect across the full corpus.]
-) <fig:aspect_freq>
+#figure(image("figures/aspect_freq.png", width: 72%), caption: [Sentence-level mention frequency per aspect across the full corpus.])<fig:aspect_freq>
 
 #figure(
   table(
@@ -422,43 +373,9 @@ The $R^2$ values of 0.25--0.26 are low in absolute terms but expected for this f
 
 Staff is the strongest positive driver of guest ratings globally; Location is the strongest negative drag. The top-3 aspects (Staff, Location, Room) were consistent across all 9 quarterly time slices from Q3 2015 through Q3 2017, confirming that SHAP rankings are stable over time rather than an artefact of any particular review period.
 
-#figure(
-  block(
-    width: 100%,
-    height: 4cm,
-    fill: luma(240),
-    stroke: 0.4pt + luma(180),
-    radius: 3pt,
-    inset: 10pt,
-    align(center + horizon)[
-      #text(size: 8.5pt, fill: luma(130), style: "italic")[
-        _Figure suggestion: Horizontal bar chart of global mean SHAP values per aspect (red = negative impact, green = positive)_ \
-        #v(0.4em)
-        Replace with: `#figure(image("figures/shap_global.png", width: 72%), caption: [...])`
-      ]
-    ]
-  ),
-  caption: [Global aspect impact ranking by mean SHAP value.]
-) <fig:shap_global>
+#figure(image("figures/shap_global.png", width: 72%), caption: [Global aspect impact ranking by mean SHAP value.]) <fig:shap_global>
 
-#figure(
-  block(
-    width: 100%,
-    height: 5cm,
-    fill: luma(240),
-    stroke: 0.4pt + luma(180),
-    radius: 3pt,
-    inset: 10pt,
-    align(center + horizon)[
-      #text(size: 8.5pt, fill: luma(130), style: "italic")[
-        _Figure suggestion: Heatmap of per-hotel SHAP values across the 15 most-reviewed hotels_ \
-        #v(0.4em)
-        Replace with: `#figure(image("figures/shap_heatmap.png", width: 95%), caption: [...])`
-      ]
-    ]
-  ),
-  caption: [Per-hotel SHAP value heatmap across the 15 most-reviewed hotels. Variation across rows illustrates that different hotels have distinct aspect-level impact profiles.]
-) <fig:shap_heatmap>
+#figure(image("figures/shap_heatmap.png", width: 95%), caption: [Per-hotel SHAP value heatmap across the 15 most-reviewed hotels. Variation across rows illustrates that different hotels have distinct aspect-level impact profiles.])<fig:shap_heatmap>
 
 == Module C: Conversational Agent
 
@@ -501,66 +418,11 @@ Agent evaluation uses a manually curated set of [_N_] test queries spanning all 
 
 = Discussion
 
-== Limitations
+== Limitations and Future Work
 
-*Aspect coverage.* The six-aspect taxonomy is fixed before modelling. Reviews that mention pricing, parking, or amenities fall outside the feature set and are dropped. No attempt is made to expand the taxonomy dynamically, in line with the project constraints.
+Three limitations are worth noting. Aspect assignment relies on keyword matching, so synonyms ("spotless" for cleanliness) and negations ("not clean") produce missed or wrong assignments; a fine-tuned sequence classifier would handle these cases without exhaustive vocabulary curation. SHAP values are unstable for hotels with fewer than 100 reviews — 412 properties (27.6%) fall below this threshold, where a single additional review can shift a sentiment score by roughly 12 percentage points; Bayesian shrinkage toward the global prior would reduce this noise for sparse hotels. Finally, HyDE retrieval is directionally biased by design: a query framed negatively generates a negative hypothetical and retrieves predominantly negative evidence, which is the intended behaviour for most queries but may miss nuance in mixed questions. The agent's 0.5 cosine similarity threshold for the low-confidence fallback was also set by inspection rather than calibrated against a labelled query set.
 
-*Keyword matching brittleness.* Aspect assignment depends on lexical overlap with the Stage 2 dictionary. Synonyms, negations ("not clean"), and sentences that mention two aspects at once can produce missed or incorrect assignments. Cleanliness and noise rely on hand-curated seed lists rather than LDA terms, so their coverage reflects domain knowledge rather than corpus statistics. Conclusions should be read as aggregate patterns, not per-sentence ground truth.
-
-*Source-field polarity as supervision.* Sentiment is assigned from which field the sentence came from. Some reviewers put negative text in the positive field and vice versa, introducing label noise that flows through to SHAP values. Basic quality checks are applied, but no deep authenticity filtering.
-
-*Agent retrieval quality.* HyDE @gao2022precise reduces the semantic gap between user queries and review text, but broad queries or aspects with thin coverage in the vector store can still trigger the low-confidence fallback. The 0.5 cosine similarity threshold was set by inspection and may need calibration against a labelled query set.
-
-*Hallucination risk.* Despite the citation requirement, GPT-4o can produce plausible-sounding text when retrieved context is weak but above the confidence threshold. The citation panel makes the evidentiary basis of each claim visible, which partially mitigates this.
-
-== Failure Modes and Future Mitigations
-
-@tab:failuremodes summarises the known failure modes, their root causes, and possible fixes for a future implementation.
-
-#figure(
-  table(
-    columns: (1.6fr, 2fr, 2.2fr),
-    inset: (x: 5pt, y: 4pt),
-    [*Limitation*], [*Root cause*], [*Possible future fix*],
-
-    [SHAP unreliable for sparse hotels],
-    [SHAP runs the global model on each hotel's review subset. With fewer than 100 reviews, one additional review can shift a sentiment score by ~12 percentage points. 412 hotels (27.6%) fall below this threshold.],
-    [Bootstrap confidence intervals on per-hotel SHAP values, or Bayesian shrinkage toward the global prior, would produce stable rankings for hotels with 30--50 reviews.],
-
-    [One aspect per sentence],
-    [The first keyword match wins. Sentences spanning two dimensions ("the room was clean but noisy") lose signal for the second aspect. Literature estimates 15--25% of hotel review sentences mention multiple aspects.],
-    [A multi-label classifier trained on a small annotated sample would assign probability scores across all six aspects simultaneously, eliminating the single-assignment constraint.],
-
-    [Keyword matching misses synonyms and negations],
-    ["Spotless" does not match Cleanliness; "not clean" matches it with the wrong polarity. Recall is lower than precision, with systematic gaps for aspects with varied vocabulary.],
-    [Embedding similarity against aspect prototype vectors, or a fine-tuned sequence classifier, handles implicit and negated mentions without requiring exhaustive vocabulary enumeration.],
-
-    [Polarity label noise],
-    [Sentiment is derived from source field. A minority of reviewers place negative text in the positive field and vice versa, introducing noise that propagates through the feature matrix.],
-    [A lightweight binary sentiment check can flag sentences where model-predicted polarity contradicts the source field. Those sentences can be excluded or down-weighted without full manual re-annotation.],
-
-    [Confidence threshold heuristic],
-    [The 0.5 cosine similarity cutoff that triggers the low-confidence fallback was set by inspection. It may produce unnecessary fallbacks on valid broad queries.],
-    [Calibrate against a held-out query set with human answerability labels, selecting the threshold that maximises F1 on the confident/fallback classification decision.],
-
-    [No hotel-to-hotel comparison],
-    [A query referencing two hotels defaults to global scope, returning portfolio-level output rather than a side-by-side comparison. The classifier has no mechanism for dual-hotel intent.],
-    [Extend `query_classifier` to detect comparative intent, resolve two hotel names independently, and route to a parallel dual-retrieval path with a comparative prompt template.],
-
-    [Conversation state lost on restart],
-    [`MemorySaver` stores state in RAM. Server restart clears all sessions; there is no interaction log for quality monitoring or threshold recalibration.],
-    [Replace `MemorySaver` with `SqliteSaver` or a Redis-backed checkpointer. Log low-confidence queries to a feedback store for periodic review.],
-
-    [English reviews only],
-    [Non-English sentences are dropped during preprocessing. Hotels with predominantly French, German, or Spanish guests have reduced coverage.],
-    [Route non-English sentences through translation before embedding, or replace `text-embedding-3-small` with `multilingual-e5-large` to map cross-lingual text to a shared embedding space.],
-  ),
-  caption: [Known failure modes, root causes, and possible mitigations for future implementations.]
-) <tab:failuremodes>
-
-== Future Work
-
-A fine-tuned sequence labelling model @pontiki2014semeval would substantially improve recall on implicit and negated aspect mentions. Nationality-based segmentation via the `Reviewer_Nationality` field could surface culturally specific service preferences. The similarity confidence threshold should be calibrated against the evaluation query set rather than set by inspection. A feedback loop logging low-quality retrievals for human review would let the vector store and threshold improve over time. Multilingual support would require either a translation preprocessing step or replacement of the embedding model with a multilingual variant.
+One commercially interesting direction for future work is *synthetic guest personas*: segment-specific agent profiles (e.g. "budget solo traveller", "family with young children") trained on the review clusters produced by this pipeline. Rather than querying historical evidence, a hotel operator could converse directly with a simulated guest — asking what they think of a proposed room reconfiguration, a new breakfast menu, or a noise-reduction policy — turning the review corpus into an interactive design tool. This would shift the system from retrospective analytics toward prospective decision support.
 
 // ============================================================
 // 6. CONCLUSION
@@ -569,20 +431,3 @@ A fine-tuned sequence labelling model @pontiki2014semeval would substantially im
 = Conclusion
 
 The pipeline described in this report takes 515,738 unstructured hotel reviews and produces something a hotel manager can actually use: a ranked list of which service aspects drive ratings up or down at their specific property, with the raw guest evidence one click away. LDA @blei2003latent extracts the vocabulary, SHAP decomposition @lundberg2017unified quantifies the impact, and a LangGraph @langgraph RAG agent @lewis2020rag surfaces both through a conversational interface so operators do not need to read SQL output or a static dashboard. The system processes all 1,492 hotels without manual annotation beyond a validation sample, and the agent's HyDE @gao2022precise retrieval and segment-aware filtering let it answer targeted questions — what business travellers complain about, which aspects are most fixable — not just broad summaries. The known limitations are real: keyword matching misses synonyms, SHAP values are noisy for small hotels, and the confidence threshold needs calibration. But for the core task of turning review volume into structured service priorities, the pipeline works.
-
-#bibliography("refs.bib", style: "ieee")
-
-#pagebreak()
-
-#heading(numbering: none)[Appendix]
-
-#heading(numbering: none)[AI Usage Declaration]
-In accordance with NUS academic integrity guidelines for BT5153, the team declares the following use of generative AI tools during this project:
-
-- *Code scaffolding:* Claude Code was used to generate boilerplate LangGraph node structure, `requirements.txt` content, and script templates. All generated code was reviewed, modified to project requirements, and validated by team members.
-
-- *Debugging assistance:* Claude Code was used to diagnose issues, and advise on feature engineering design. Findings were independently verified against the codebase.
-
-- *Content drafting:* Gemini 3-Pro/GPT 5/Claude Sonnet 4.6 was used to inform initial document drafts. Final wording was reviewed and refined by the team for technical accuracy and BT5153 rubric alignment.
-
-- *Human-only contributions:* Model selection rationale, feature engineering design decisions, architectural choices, test case design, and all critical reflection content reflect team analysis and were not generated by AI tools.

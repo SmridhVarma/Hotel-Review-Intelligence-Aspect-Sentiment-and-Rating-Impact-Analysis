@@ -19,13 +19,11 @@ build/
 data/*.csv
 data/*.json
 data/*.parquet
-notebooks/data.csv
 
 # Large pipeline outputs
 outputs/model_artifacts/*.pkl
 outputs/model_artifacts/*.joblib
 outputs/aspect_sentences.csv
-outputs/clean_reviews_stage1.csv
 outputs/sentences.csv
 outputs/review_features.csv
 
@@ -41,17 +39,20 @@ chromadb/
 # OS
 .DS_Store
 Thumbs.db
-*.stackdump
-
-# Generated outputs (keep local)
-presentation/
 
 # Claude Code
 .claude/
 
 # Internal planning docs
 docs/superpowers/
+docs/Report_Draft.pdf
+docs/report_text.txt
+docs/report_draft.md
+docs/refs.bib
 
-outputs/_lda_cache/
-outputs/*.backup.json
-outputs/sample.csv
+# Additional
+tests/
+presentation/
+
+
+notebooks/data.csv

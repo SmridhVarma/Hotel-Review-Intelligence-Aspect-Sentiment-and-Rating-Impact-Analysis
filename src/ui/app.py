@@ -152,7 +152,7 @@ def reset_session(hotel_display: str):
 # ── UI assembly ───────────────────────────────────────────────────────────────
 
 def build_ui() -> gr.Blocks:
-    with gr.Blocks(title="Hotel Review Intelligence", theme=gr.themes.Soft()) as demo:
+    with gr.Blocks(title="Hotel Review Intelligence") as demo:
 
         # Per-session state
         thread_id_state = gr.State(value=str(uuid.uuid4()))
@@ -189,7 +189,6 @@ def build_ui() -> gr.Blocks:
                 chatbot = gr.Chatbot(
                     label="Chat",
                     height=420,
-                    type="messages",
                 )
                 with gr.Row():
                     msg_input = gr.Textbox(
@@ -228,4 +227,4 @@ def build_ui() -> gr.Blocks:
 
 if __name__ == "__main__":
     ui = build_ui()
-    ui.launch(server_name="0.0.0.0", server_port=7860, share=False)
+    ui.launch(server_name="0.0.0.0", server_port=7860, share=False, theme=gr.themes.Soft())

@@ -15,7 +15,7 @@ if not exist ".env" (
 )
 
 REM ── Stage 5: ingest if ChromaDB not yet built ────────────────────────────────
-if not exist "chromadb\" (
+if not exist "chromadb\.ingest_complete" (
     echo  ChromaDB not found. Running Stage 5 ingestion...
     echo  This embeds ~735k review sentences via OpenAI text-embedding-3-small.
     echo  Estimated time: 20-40 minutes. Estimated cost: ~$0.30.

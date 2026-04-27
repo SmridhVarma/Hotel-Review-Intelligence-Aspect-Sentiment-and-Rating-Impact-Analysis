@@ -13,8 +13,8 @@ review sentences (both are statement-form past-tense text). A raw query
 parts of embedding space; a hypothetical answer sits much closer.
 
 Neutral queries generate three hypotheticals (positive / negative / neutral
-tone) concurrently via asyncio.gather, giving the retriever three different
-entry points for stratified sampling.
+tone) sequentially, giving the retriever three different entry points for
+stratified sampling.
 
 Reads:  query, hotel_name, query_direction
 Writes: hyde_hypotheticals, hyde_embeddings
@@ -22,7 +22,6 @@ Writes: hyde_hypotheticals, hyde_embeddings
 
 from __future__ import annotations
 
-import asyncio
 import os
 import sys
 
@@ -65,29 +64,32 @@ def _embed(texts: list[str]) -> list[list[float]]:
     return [e.embedding for e in response.data]
 
 
-async def _generate_hypothetical(query: str, hotel_context: str, direction: str) -> str:
+def _generate_hypothetical(query: str, hotel_context: str, direction: str) -> str:
+    """Generate one hypothetical review sentence synchronously."""
     chain = HYDE_PROMPT | _get_llm()
-    result = await chain.ainvoke({
-        "query":              query,
-        "hotel_context":      hotel_context,
+    result = chain.invoke({
+        "query":               query,
+        "hotel_context":       hotel_context,
         "sentiment_direction": direction,
     })
     return result.content.strip()
 
 
 def hyde_expander(state: AgentState) -> dict:
-    query          = state["query"]
-    hotel_name     = state.get("hotel_name", "__global__")
-    direction      = state.get("query_direction", "neutral")
-    hotel_context  = hotel_name if hotel_name != "__global__" else "all hotels"
+    query         = state["query"]
+    hotel_name    = state.get("hotel_name", "__global__")
+    direction     = state.get("query_direction", "neutral")
+    hotel_context = hotel_name if hotel_name != "__global__" else "all hotels"
 
     if direction == "neutral":
-        # Three hypotheticals for stratified retrieval
-        hypotheticals = asyncio.run(_generate_all(query, hotel_context))
+        # Three hypotheticals for stratified retrieval — generated sequentially
+        hypotheticals = [
+            _generate_hypothetical(query, hotel_context, "positive"),
+            _generate_hypothetical(query, hotel_context, "negative"),
+            _generate_hypothetical(query, hotel_context, "neutral"),
+        ]
     else:
-        # One directional hypothetical
-        hyp = asyncio.run(_generate_hypothetical(query, hotel_context, direction))
-        hypotheticals = [hyp]
+        hypotheticals = [_generate_hypothetical(query, hotel_context, direction)]
 
     embeddings = _embed(hypotheticals)
 
@@ -95,12 +97,3 @@ def hyde_expander(state: AgentState) -> dict:
         "hyde_hypotheticals": hypotheticals,
         "hyde_embeddings":    embeddings,
     }
-
-
-async def _generate_all(query: str, hotel_context: str) -> list[str]:
-    results = await asyncio.gather(
-        _generate_hypothetical(query, hotel_context, "positive"),
-        _generate_hypothetical(query, hotel_context, "negative"),
-        _generate_hypothetical(query, hotel_context, "neutral"),
-    )
-    return list(results)

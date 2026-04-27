@@ -1,0 +1,89 @@
+{
+  "linear_regression": {
+    "rmse": 1.4125323301470902,
+    "mae": 1.085669202370051,
+    "r2": 0.24637548720324398
+  },
+  "xgboost": {
+    "rmse": 1.4014055384327477,
+    "mae": 1.0756078731089531,
+    "r2": 0.2582016181923905
+  },
+  "shap_stability": {
+    "top_3_consistent_across_slices": true,
+    "slice_rankings": [
+      {
+        "period": "2015Q3",
+        "top_aspects": [
+          "room",
+          "staff",
+          "location"
+        ]
+      },
+      {
+        "period": "2015Q4",
+        "top_aspects": [
+          "room",
+          "staff",
+          "location"
+        ]
+      },
+      {
+        "period": "2016Q1",
+        "top_aspects": [
+          "room",
+          "staff",
+          "location"
+        ]
+      },
+      {
+        "period": "2016Q2",
+        "top_aspects": [
+          "room",
+          "staff",
+          "location"
+        ]
+      },
+      {
+        "period": "2016Q3",
+        "top_aspects": [
+          "room",
+          "staff",
+          "location"
+        ]
+      },
+      {
+        "period": "2016Q4",
+        "top_aspects": [
+          "room",
+          "staff",
+          "location"
+        ]
+      },
+      {
+        "period": "2017Q1",
+        "top_aspects": [
+          "room",
+          "staff",
+          "location"
+        ]
+      },
+      {
+        "period": "2017Q2",
+        "top_aspects": [
+          "room",
+          "staff",
+          "location"
+        ]
+      },
+      {
+        "period": "2017Q3",
+        "top_aspects": [
+          "room",
+          "staff",
+          "location"
+        ]
+      }
+    ]
+  }
+}

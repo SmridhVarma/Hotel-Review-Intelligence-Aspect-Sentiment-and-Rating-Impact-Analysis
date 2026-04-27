@@ -3,7 +3,7 @@ Stage 5: ChromaDB Ingestion
 
 Embeds all review sentences and SHAP summaries into a local ChromaDB instance
 for retrieval by the LangGraph agent. Run once after the full pipeline completes.
-Safe to rerun — clears and rebuilds both collections each time.
+Resume-safe — skips IDs already present in each collection.
 
 Usage:
     python -m src.agent.ingest
@@ -70,10 +70,28 @@ def get_chroma_client():
 
 # ── Embedding helper ──────────────────────────────────────────────────────────
 
+def _embed_batch_with_retry(batch: list[str], client: OpenAI, max_retries: int = 5) -> list[list[float]]:
+    """Embed one batch with exponential-backoff retry on transient errors."""
+    delay = 5.0
+    for attempt in range(max_retries):
+        try:
+            response = client.embeddings.create(model=EMBED_MODEL, input=batch)
+            return [e.embedding for e in response.data]
+        except Exception as exc:
+            if attempt == max_retries - 1:
+                raise
+            print(f"\n  Embedding error (attempt {attempt + 1}/{max_retries}): {exc}")
+            print(f"  Retrying in {delay:.0f}s...")
+            time.sleep(delay)
+            delay = min(delay * 2, 120)
+    return []  # unreachable
+
+
 def embed_texts(texts: list[str], client: OpenAI) -> list[list[float]]:
     """
     Embed a list of texts in batches using text-embedding-3-small.
     Returns a flat list of 1536-dim vectors in the same order as input.
+    Retries each batch up to 5 times with exponential backoff.
     """
     all_embeddings: list[list[float]] = []
     total = len(texts)
@@ -83,8 +101,7 @@ def embed_texts(texts: list[str], client: OpenAI) -> list[list[float]]:
         # Replace empty strings — OpenAI rejects them
         batch = [t if t.strip() else "." for t in batch]
 
-        response = client.embeddings.create(model=EMBED_MODEL, input=batch)
-        batch_embeddings = [e.embedding for e in response.data]
+        batch_embeddings = _embed_batch_with_retry(batch, client)
         all_embeddings.extend(batch_embeddings)
 
         done = min(start + EMBED_BATCH, total)
@@ -142,26 +159,28 @@ def ingest_evidence_store(
 ) -> None:
     """
     Embed all rows in aspect_sentences.csv and upsert into evidence_store.
+    Resume-safe: skips IDs already present in the collection.
 
     Each document is the sentence text. Metadata fields:
         hotel_name, aspect, sentiment, reviewer_segment, reviewer_score
     """
-    print(f"\nIngesting evidence_store ({len(df):,} sentences)...")
+    total = len(df)
+    print(f"\nIngesting evidence_store ({total:,} sentences)...")
 
-    # Drop and recreate for a clean rebuild
+    # Get or create collection (no delete — preserves progress on resume)
     try:
-        chroma_client.delete_collection(CHROMA_EVIDENCE)
-        print("  Cleared existing evidence_store.")
+        collection = chroma_client.get_collection(CHROMA_EVIDENCE)
+        existing = set(collection.get(include=[])["ids"])
+        print(f"  Resuming — {len(existing):,} IDs already stored.")
     except Exception:
-        pass
+        collection = chroma_client.create_collection(
+            name=CHROMA_EVIDENCE,
+            metadata={"hnsw:space": "cosine"},
+        )
+        existing = set()
 
-    collection = chroma_client.create_collection(
-        name=CHROMA_EVIDENCE,
-        metadata={"hnsw:space": "cosine"},
-    )
-
+    all_ids   = [f"ev_{i}" for i in range(total)]
     texts     = df["sentence"].astype(str).tolist()
-    ids       = [f"ev_{i}" for i in range(len(df))]
     metadatas = [
         {
             "hotel_name":       str(row.hotel_name),
@@ -173,21 +192,29 @@ def ingest_evidence_store(
         for row in df.itertuples(index=False)
     ]
 
-    print("  Generating embeddings...")
-    embeddings = embed_texts(texts, openai_client)
+    # Filter to only rows not yet embedded
+    pending_idx = [i for i, id_ in enumerate(all_ids) if id_ not in existing]
+    if not pending_idx:
+        print(f"  evidence_store already complete ({collection.count():,} documents).")
+        return
 
-    # Upsert in batches (ChromaDB handles large upserts fine but batching
-    # keeps memory predictable)
+    print(f"  {len(pending_idx):,} sentences to embed...")
+    pending_texts = [texts[i] for i in pending_idx]
+    pending_ids   = [all_ids[i] for i in pending_idx]
+    pending_meta  = [metadatas[i] for i in pending_idx]
+
+    embeddings = embed_texts(pending_texts, openai_client)
+
     print("  Upserting to ChromaDB...")
-    for start in range(0, len(texts), 5000):
-        end = min(start + 5000, len(texts))
+    for start in range(0, len(pending_texts), 5000):
+        end = min(start + 5000, len(pending_texts))
         collection.upsert(
-            ids=ids[start:end],
-            documents=texts[start:end],
+            ids=pending_ids[start:end],
+            documents=pending_texts[start:end],
             embeddings=embeddings[start:end],
-            metadatas=metadatas[start:end],
+            metadatas=pending_meta[start:end],
         )
-        print(f"  Upserted {end:,} / {len(texts):,}", end="\r")
+        print(f"  Upserted {end:,} / {len(pending_texts):,}", end="\r")
 
     print(f"  evidence_store: {collection.count():,} documents.          ")
 
@@ -210,30 +237,31 @@ def ingest_summary_store(
     """
     print(f"\nIngesting summary_store ({len(shap_data):,} entries)...")
 
+    # Get or create collection — resume-safe
     try:
-        chroma_client.delete_collection(CHROMA_SUMMARY)
-        print("  Cleared existing summary_store.")
+        collection = chroma_client.get_collection(CHROMA_SUMMARY)
+        existing = set(collection.get(include=[])["ids"])
+        print(f"  Resuming — {len(existing):,} IDs already stored.")
     except Exception:
-        pass
-
-    collection = chroma_client.create_collection(
-        name=CHROMA_SUMMARY,
-        metadata={"hnsw:space": "cosine"},
-    )
+        collection = chroma_client.create_collection(
+            name=CHROMA_SUMMARY,
+            metadata={"hnsw:space": "cosine"},
+        )
+        existing = set()
 
     texts     = []
     ids       = []
     metadatas = []
 
-    for i, entry in enumerate(shap_data):
+    for entry in shap_data:
         hotel_name   = entry["hotel_name"]
+        id_          = f"sum_{hotel_name}"
+        if id_ in existing:
+            continue
         review_count = entry.get("review_count", 0)
         narrative    = format_shap_narrative(entry)
-
         texts.append(narrative)
-        ids.append(f"sum_{hotel_name}")
-        # Prefer the insufficient_data flag set by model.py (threshold=100 reviews)
-        # rather than recomputing; fall back to MIN_REVIEWS for entries without it.
+        ids.append(id_)
         insuf = entry.get(
             "insufficient_data",
             hotel_name != "__global__" and review_count < MIN_REVIEWS,
@@ -244,7 +272,11 @@ def ingest_summary_store(
             "insufficient_data": bool(insuf),
         })
 
-    print("  Generating embeddings...")
+    if not texts:
+        print(f"  summary_store already complete ({collection.count():,} documents).")
+        return
+
+    print(f"  {len(texts):,} entries to embed...")
     embeddings = embed_texts(texts, openai_client)
 
     collection.upsert(
@@ -314,6 +346,11 @@ def run() -> None:
     ingest_evidence_store(df, chroma_client, openai_client)
     ingest_summary_store(shap_data, chroma_client, openai_client)
     export_hotel_list(df)
+
+    # Write sentinel so local_startup.bat knows ingest finished cleanly
+    sentinel = os.path.join(CHROMADB_DIR, ".ingest_complete")
+    with open(sentinel, "w") as f:
+        f.write("ok\n")
 
     print("\nStage 5 complete.")
 
