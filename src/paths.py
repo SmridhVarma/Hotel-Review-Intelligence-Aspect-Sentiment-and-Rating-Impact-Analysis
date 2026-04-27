@@ -20,7 +20,7 @@ OUTPUT_DIR    = os.path.join(PROJECT_ROOT, "outputs")
 ARTIFACTS_DIR = os.path.join(OUTPUT_DIR, "model_artifacts")
 
 # ── Stage 1 inputs / outputs  (preprocess.py) ────────────────────────────────
-RAW_DATA      = os.path.join(DATA_DIR,    "data.csv")
+RAW_DATA      = os.path.join(DATA_DIR,    "data.xlsx")
 SENTENCES     = os.path.join(OUTPUT_DIR,  "sentences.csv")
 CLEAN_REVIEWS = os.path.join(OUTPUT_DIR,  "clean_reviews_stage1.csv")
 

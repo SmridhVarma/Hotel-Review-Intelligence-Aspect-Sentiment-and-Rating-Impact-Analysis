@@ -56,37 +56,33 @@ OPENAI_API_KEY=sk-...
 The OneDrive folder holds everything too large for GitHub:
 
 ```
-OneDrive/
-├── data.csv                        # raw 515k hotel reviews (228 MB)
-├── stage1/
+OneDrive/BT5153_Group_Project/
+├── data.xlsx                                    # raw 515k hotel reviews (228 MB)
+├── Stage 1, EDA and Preprocessing Outputs/
 │   ├── sentences.csv
 │   └── clean_reviews_stage1.csv
-├── stage2/
+├── Stage 2 Outputs/
 │   └── aspect_dictionary.json
-├── stage3/
+├── Stage 3 Outputs/
 │   ├── aspect_sentences.csv
 │   └── review_features.csv
-├── stage4/
+├── Stage 4, Impact Analysis Outputs/
 │   ├── shap_summary.json
-│   ├── evaluation_report.json
-│   └── model_artifacts/
-│       ├── linear_model.pkl
-│       └── xgb_model.pkl
-└── stage5/
-    └── chromadb/                   # pre-built vector DB (5.5 GB)
+│   └── evaluation_report.json
+└── Stage 5, Agent/
+    └── chromadb/                                # pre-built vector DB (~5.5 GB)
 ```
 
 Where to put things:
 
 | OneDrive path | Local path |
 |---|---|
-| `data.csv` | `data/data.csv` |
-| `stage1/*` | `outputs/` |
-| `stage2/*` | `outputs/` |
-| `stage3/*` | `outputs/` |
-| `stage4/shap_summary.json`, `evaluation_report.json` | `outputs/` |
-| `stage4/model_artifacts/` | `outputs/model_artifacts/` |
-| `stage5/chromadb/` | `chromadb/` (project root) |
+| `data.xlsx` | `data/data.xlsx` |
+| `Stage 1, EDA and Preprocessing Outputs/*` | `outputs/` |
+| `Stage 2 Outputs/*` | `outputs/` |
+| `Stage 3 Outputs/*` | `outputs/` |
+| `Stage 4, Impact Analysis Outputs/*` | `outputs/` |
+| `Stage 5, Agent/chromadb/` | `chromadb/` (project root) |
 
 ### 4. Launch
 
@@ -234,7 +230,7 @@ BT5153_Group_Project/
 
 515k European hotel reviews across 1,492 hotels. Not in the repo (228 MB).
 
-Download `data.csv` from OneDrive and place it at `data/data.csv`.
+Download `data.xlsx` from OneDrive and place it at `data/data.xlsx`.
 
 Source: [515K Hotel Reviews Data in Europe — Kaggle](https://www.kaggle.com/datasets/jiashenliu/515k-hotel-reviews-data-in-europe)
 

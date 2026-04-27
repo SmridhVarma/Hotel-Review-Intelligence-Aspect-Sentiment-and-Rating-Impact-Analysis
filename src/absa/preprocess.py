@@ -228,7 +228,14 @@ def run(data_path: str = None, output_dir: str = None) -> None:
     project_root = os.path.normpath(os.path.join(here, "..", ".."))
 
     if data_path is None:
-        data_path = os.path.join(project_root, "data", "data.csv")
+        # Accept either .xlsx or .csv — prefer .xlsx (OneDrive default)
+        for _ext in ("data.xlsx", "data.csv"):
+            _candidate = os.path.join(project_root, "data", _ext)
+            if os.path.isfile(_candidate):
+                data_path = _candidate
+                break
+        else:
+            data_path = os.path.join(project_root, "data", "data.xlsx")
     if output_dir is None:
         output_dir = os.path.join(project_root, "outputs")
 
@@ -238,11 +245,14 @@ def run(data_path: str = None, output_dir: str = None) -> None:
     if not os.path.isfile(data_path):
         raise FileNotFoundError(
             f"Dataset not found at {data_path}\n"
-            "Place the CSV file at data/data.csv (project root)."
+            "Place data.xlsx (or data.csv) in the data/ folder."
         )
 
     print(f"Loading {data_path} …")
-    df = pd.read_csv(data_path, low_memory=False)
+    if data_path.endswith(".xlsx"):
+        df = pd.read_excel(data_path)
+    else:
+        df = pd.read_csv(data_path, low_memory=False)
     df["Review_Date"] = pd.to_datetime(df["Review_Date"], errors="coerce")
     df["Review_Date"] = df["Review_Date"].dt.strftime("%Y-%m-%d")
     print(f"  Loaded {len(df):,} rows, {df.shape[1]} columns.")
