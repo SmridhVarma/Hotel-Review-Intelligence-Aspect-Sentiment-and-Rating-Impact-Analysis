@@ -48,6 +48,7 @@ load_dotenv()
 EMBED_MODEL = "text-embedding-3-small"
 EMBED_BATCH = 500          # rows per OpenAI embeddings API call
 BATCH_SLEEP = 0.5          # seconds between batches (rate limit headroom)
+CHUNK_SIZE  = 2500         # embed + upsert this many rows at a time (saves progress)
 MIN_REVIEWS = 20           # hotels below this threshold get insufficient_data=True
 CHROMA_EVIDENCE = "evidence_store"
 CHROMA_SUMMARY  = "summary_store"
@@ -70,12 +71,14 @@ def get_chroma_client():
 
 # ── Embedding helper ──────────────────────────────────────────────────────────
 
-def _embed_batch_with_retry(batch: list[str], client: OpenAI, max_retries: int = 5) -> list[list[float]]:
+def _embed_batch_with_retry(batch: list[str], client: OpenAI, max_retries: int = 12) -> list[list[float]]:
     """Embed one batch with exponential-backoff retry on transient errors."""
-    delay = 5.0
+    delay = 10.0
     for attempt in range(max_retries):
         try:
-            response = client.embeddings.create(model=EMBED_MODEL, input=batch)
+            response = client.embeddings.create(
+                model=EMBED_MODEL, input=batch, timeout=120
+            )
             return [e.embedding for e in response.data]
         except Exception as exc:
             if attempt == max_retries - 1:
@@ -83,7 +86,7 @@ def _embed_batch_with_retry(batch: list[str], client: OpenAI, max_retries: int =
             print(f"\n  Embedding error (attempt {attempt + 1}/{max_retries}): {exc}")
             print(f"  Retrying in {delay:.0f}s...")
             time.sleep(delay)
-            delay = min(delay * 2, 120)
+            delay = min(delay * 2, 180)
     return []  # unreachable
 
 
@@ -159,7 +162,8 @@ def ingest_evidence_store(
 ) -> None:
     """
     Embed all rows in aspect_sentences.csv and upsert into evidence_store.
-    Resume-safe: skips IDs already present in the collection.
+    Resume-safe: embeds + upserts in small chunks so progress is saved
+    incrementally. On restart, skips the chunks already stored.
 
     Each document is the sentence text. Metadata fields:
         hotel_name, aspect, sentiment, reviewer_segment, reviewer_score
@@ -170,16 +174,25 @@ def ingest_evidence_store(
     # Get or create collection (no delete — preserves progress on resume)
     try:
         collection = chroma_client.get_collection(CHROMA_EVIDENCE)
-        existing = set(collection.get(include=[])["ids"])
-        print(f"  Resuming — {len(existing):,} IDs already stored.")
+        already_stored = collection.count()
+        print(f"  Resuming — {already_stored:,} documents already stored.")
     except Exception:
         collection = chroma_client.create_collection(
             name=CHROMA_EVIDENCE,
             metadata={"hnsw:space": "cosine"},
         )
-        existing = set()
+        already_stored = 0
 
-    all_ids   = [f"ev_{i}" for i in range(total)]
+    if already_stored >= total:
+        print(f"  evidence_store already complete ({already_stored:,} documents).")
+        return
+
+    # IDs are sequential (ev_0, ev_1, ...) so we can use count to find the
+    # resume offset.  This avoids fetching all 735k IDs into a set.
+    start_idx = already_stored
+    remaining = total - start_idx
+    print(f"  {remaining:,} sentences remaining (starting from index {start_idx:,})...")
+
     texts     = df["sentence"].astype(str).tolist()
     metadatas = [
         {
@@ -192,31 +205,34 @@ def ingest_evidence_store(
         for row in df.itertuples(index=False)
     ]
 
-    # Filter to only rows not yet embedded
-    pending_idx = [i for i, id_ in enumerate(all_ids) if id_ not in existing]
-    if not pending_idx:
-        print(f"  evidence_store already complete ({collection.count():,} documents).")
-        return
+    # Process in small chunks: embed -> upsert -> repeat.
+    # Each chunk is saved immediately, so a crash only loses the current chunk.
+    for chunk_start in range(start_idx, total, CHUNK_SIZE):
+        chunk_end = min(chunk_start + CHUNK_SIZE, total)
+        chunk_ids   = [f"ev_{i}" for i in range(chunk_start, chunk_end)]
+        chunk_texts = texts[chunk_start:chunk_end]
+        chunk_meta  = metadatas[chunk_start:chunk_end]
 
-    print(f"  {len(pending_idx):,} sentences to embed...")
-    pending_texts = [texts[i] for i in pending_idx]
-    pending_ids   = [all_ids[i] for i in pending_idx]
-    pending_meta  = [metadatas[i] for i in pending_idx]
+        # Replace empty strings — OpenAI rejects them
+        chunk_texts_clean = [t if t.strip() else "." for t in chunk_texts]
 
-    embeddings = embed_texts(pending_texts, openai_client)
+        print(f"\n  Chunk [{chunk_start:,}-{chunk_end:,}] / {total:,}  "
+              f"Embedding {len(chunk_texts_clean)} texts...")
 
-    print("  Upserting to ChromaDB...")
-    for start in range(0, len(pending_texts), 5000):
-        end = min(start + 5000, len(pending_texts))
+        # Embed this chunk
+        chunk_embeddings = embed_texts(chunk_texts_clean, openai_client)
+
+        # Upsert immediately — this saves progress
         collection.upsert(
-            ids=pending_ids[start:end],
-            documents=pending_texts[start:end],
-            embeddings=embeddings[start:end],
-            metadatas=pending_meta[start:end],
+            ids=chunk_ids,
+            documents=chunk_texts,
+            embeddings=chunk_embeddings,
+            metadatas=chunk_meta,
         )
-        print(f"  Upserted {end:,} / {len(pending_texts):,}", end="\r")
+        stored = collection.count()
+        print(f"  [OK] Saved. Total stored: {stored:,} / {total:,}")
 
-    print(f"  evidence_store: {collection.count():,} documents.          ")
+    print(f"\n  evidence_store: {collection.count():,} documents -- done.")
 
 
 # ── Summary store ingestion ───────────────────────────────────────────────────
