@@ -5,7 +5,7 @@
 The system runs in five offline stages before the agent becomes available. Each stage feeds the next through well-defined CSV and JSON contracts.
 
 ```
-data/data.csv  (515k reviews, 1,492 hotels)
+data/data.xlsx  (515k reviews, 1,492 hotels)
       │
       ▼
 Stage 1 — src/absa/preprocess.py
@@ -55,10 +55,10 @@ The agent is a directed graph of eight nodes. Each node receives the full `Agent
 |---|---|---|
 | `query_classifier` | `nodes/query_classifier.py` | Parses query into structured fields: scope, query_type, query_direction, aspects, hotel_name, reviewer_segment. Uses GPT-4o with Pydantic validation; falls back to safe defaults on parse failure. |
 | `segment_filter` | `nodes/segment_filter.py` | Detects reviewer segment from query text and sets the ChromaDB metadata filter. Falls back to unfiltered retrieval if no segment is detected. |
-| `hyde_expander` | `nodes/hyde_expander.py` | Generates hypothetical ideal answers for embedding. Directional queries get one hypothetical; neutral queries get three (positive, negative, neutral) generated concurrently with `asyncio.gather`. |
+| `hyde_expander` | `nodes/hyde_expander.py` | Generates hypothetical ideal answers for embedding. Directional queries get one hypothetical; neutral queries get three (positive, negative, neutral) generated sequentially via synchronous `.invoke()` calls. |
 | `evidence_retriever` | `nodes/evidence_retriever.py` | Embeds the hypothetical(s) and queries `evidence_store` with any active metadata filters. Neutral queries use stratified retrieval (7 docs per sentiment pole, deduplicated). |
 | `summary_retriever` | `nodes/summary_retriever.py` | Fetches the SHAP narrative for the selected hotel (or `__global__`) from `summary_store`. Used for prioritization queries; bypasses embedding entirely. |
-| `context_merger` | `nodes/context_merger.py` | Combines retrieved chunks, computes mean cosine similarity, and sets `low_confidence=True` if similarity is below threshold. |
+| `context_merger` | `nodes/context_merger.py` | Combines retrieved chunks and SHAP summary context. Sets `low_confidence=True` only on hard failures: hotel name unresolvable (fuzzy match confidence < 70), or both evidence chunks and summary context are empty. |
 | `response_generator` | `nodes/response_generator.py` | Passes retrieved context to GPT-4o with a grounding prompt. Triggers the "cannot answer confidently" fallback when `low_confidence` is set. |
 | `state_manager` | `nodes/state_manager.py` | Persists hotel context and conversation topic across turns. Resets on topic shift. Used for multi-turn follow-up queries. |
 
@@ -68,7 +68,7 @@ The agent is a directed graph of eight nodes. Each node receives the full `Agent
 
 Two separate collections — one for raw evidence, one for model-level summaries. Routing is determined by `query_type`.
 
-**`evidence_store`** (~1M documents)
+**`evidence_store`** (~735k documents)
 - One document per sentence from Stage 3
 - Embedded with `text-embedding-3-small` (1536 dimensions)
 - Metadata: `hotel_name`, `aspect`, `sentiment`, `reviewer_segment`, `reviewer_score`
@@ -82,7 +82,7 @@ Two separate collections — one for raw evidence, one for model-level summaries
 - Used by: `summary_retriever`
 - Query type: metadata `get()` — no embedding needed
 
-**Routing rule:** `query_type == "prioritization"` → `summary_store`; all other types → `evidence_store`.
+**Routing rule:** `query_type in ("prioritization", "mismatch")` → `summary_store`; all other types → `evidence_store`.
 
 **Schema contract** (enforced at ingest):
 - `aspect`: `Cleanliness | Staff | Location | Noise | Food | Room`
@@ -108,8 +108,9 @@ The agent handles four query patterns:
 
 1. **Evidence** — "Why do guests complain about cleanliness?" Retrieves matching sentences from `evidence_store`.
 2. **Prioritization** — "Which issue should this hotel fix first?" Fetches the SHAP ranking from `summary_store`.
-3. **Segment** — "What do business travellers value most?" Applies a `reviewer_segment` metadata filter before retrieval.
-4. **Follow-up** — Queries with no hotel name re-use the hotel context from the prior turn via `state_manager`.
+3. **Mismatch** — "Which aspects show the biggest gap between text sentiment and score?" Fetches SHAP narrative from `summary_store` and highlights aspects where model attribution diverges from raw review volume.
+4. **Segment** — "What do business travellers value most?" Applies a `reviewer_segment` metadata filter before retrieval.
+5. **Follow-up** — Queries with no hotel name re-use the hotel context from the prior turn via `state_manager`.
 
 **Out of scope (v1):** Cross-hotel comparisons. Queries like "compare Hotel Arena to Hotel X" fall back to global retrieval without flagging the scope mismatch. This is a known limitation.
 
@@ -129,6 +130,6 @@ The agent handles four query patterns:
 
 | Operation | Volume | Model | Estimated cost |
 |---|---|---|---|
-| Sentence embedding (Stage 5, once) | ~1M sentences × ~20 tokens | `text-embedding-3-small` | ~$0.40 |
-| Per-query LLM calls | ~4-5 GPT-4o calls | `gpt-4o` | ~$0.01–0.02 per query |
-| DeepEval test run (13 queries) | ~39 GPT-4o calls | `gpt-4o` | ~$0.20 |
+| Sentence embedding (Stage 5, once) | ~735k sentences × ~20 tokens | `text-embedding-3-small` | ~$0.30 |
+| Per-query LLM calls | ~3–5 GPT-4o calls | `gpt-4o` | ~$0.01–0.02 per query |
+| Agent eval run (20 queries + GPT-4o judge) | ~100 GPT-4o calls | `gpt-4o` | ~$0.10–0.20 |
