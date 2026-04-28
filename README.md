@@ -20,6 +20,7 @@ A trimmed demo is deployed on Hugging Face Spaces for evaluation. No setup requi
 - Citations panel shows up to 5 sources per response, not the full retrieval set
 - Vector store uses a numpy-backed cosine similarity engine rather than ChromaDB, to avoid Rust/C++ compilation on the HF build environment
 - Multi-turn follow-up is slightly limited — HuggingFace Spaces manages conversation history differently from the local setup, so context carry-over across turns may be less reliable than the full local deployment
+- **The live demo API key expires 12 May 2026** (NUS-provided key). After that date the demo will return errors; the full local deployment with your own key remains fully functional
 
 **Access notes:**
 
