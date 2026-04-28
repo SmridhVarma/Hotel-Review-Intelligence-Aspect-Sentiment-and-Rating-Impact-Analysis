@@ -162,7 +162,7 @@ Runs 20 queries across all four query types, computes automatic metrics, and cal
 BT5153_Group_Project/
 │
 ├── data/
-│   └── data.csv                        # 515k hotel reviews (download from OneDrive)
+│   └── data.xlsx                       # 515k hotel reviews (download from OneDrive)
 │
 ├── src/
 │   ├── paths.py                        # single source of truth for all file paths

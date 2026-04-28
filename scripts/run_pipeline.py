@@ -5,7 +5,7 @@
 #   Runs all pipeline stages end-to-end. Each stage is a separate import
 #   and function call — stages can be skipped or re-run individually.
 #
-#   Stage 1  src.absa.preprocess          data/data.csv
+#   Stage 1  src.absa.preprocess          data/data.xlsx
 #                                       → outputs/sentences.csv
 #                                       → outputs/clean_reviews_stage1.csv
 #   Stage 2  src.absa.aspect_extraction   outputs/sentences.csv
@@ -30,7 +30,7 @@
 #   python scripts/run_pipeline.py --only 4     # run only stage 4
 #   python scripts/run_pipeline.py --only 5     # re-ingest after fixes
 #
-# Input:  data/data.csv
+# Input:  data/data.xlsx
 # Output: all outputs/ artifacts + chromadb/
 # =============================================================================
 
