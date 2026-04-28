@@ -50,8 +50,8 @@ Fastest path. Download the pre-computed outputs from OneDrive and skip the 1–2
 ### 1. Clone and install
 
 ```bash
-git clone <repo-url>
-cd BT5153_Group_Project
+git clone https://github.com/SmridhVarma/Hotel-Review-Intelligence-Aspect-Sentiment-and-Rating-Impact-Analysis.git
+cd Hotel-Review-Intelligence-Aspect-Sentiment-and-Rating-Impact-Analysis
 
 python -m venv .venv
 .venv\Scripts\activate          # Windows
@@ -119,7 +119,7 @@ Checks your `.env`, checks ChromaDB (runs Stage 5 ingestion automatically if it 
 
 ## Running the full pipeline from scratch
 
-Requires `data/data.csv` from OneDrive. Skips any stage whose output files already exist.
+Requires `data/data.xlsx` from OneDrive. Skips any stage whose output files already exist.
 
 ```bash
 python scripts/run_pipeline.py              # stages 1–5, ~1-2 hours
