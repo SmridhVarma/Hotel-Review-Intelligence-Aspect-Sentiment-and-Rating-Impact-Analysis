@@ -45,7 +45,7 @@ The agent sits on top: a LangGraph DAG with HyDE query expansion, stratified Chr
 
 ## Quick start (evaluator — pre-computed outputs)
 
-Fastest path. Download the pre-computed outputs from OneDrive and skip the 1–2 hour pipeline run.
+Three steps. Most pipeline outputs are already in the repo — you only need the vector database from OneDrive.
 
 ### 1. Clone and install
 
@@ -72,38 +72,19 @@ Open `.env` and fill in:
 OPENAI_API_KEY=sk-...
 ```
 
-### 3. Download from OneDrive
+### 3. Download the vector database from OneDrive
 
-The OneDrive folder holds everything too large for GitHub:
+From the shared OneDrive folder, download **`Stage 5, Agent/chromadb/`** and place the entire `chromadb/` folder at the project root:
 
 ```
-OneDrive/BT5153_Group_Project/
-├── data.xlsx                                    # raw 515k hotel reviews (228 MB)
-├── Stage 1, EDA and Preprocessing Outputs/
-│   ├── sentences.csv
-│   └── clean_reviews_stage1.csv
-├── Stage 2 Outputs/
-│   └── aspect_dictionary.json
-├── Stage 3 Outputs/
-│   ├── aspect_sentences.csv
-│   └── review_features.csv
-├── Stage 4, Impact Analysis Outputs/
-│   ├── shap_summary.json
-│   └── evaluation_report.json
-└── Stage 5, Agent/
-    └── chromadb/                                # pre-built vector DB (~5.5 GB)
+Hotel-Review-Intelligence-.../
+├── chromadb/          ← place here (downloaded from OneDrive, ~5.5 GB)
+├── outputs/           ← already in repo, nothing to add
+├── src/
+└── ...
 ```
 
-Where to put things:
-
-| OneDrive path | Local path |
-|---|---|
-| `data.xlsx` | `data/data.xlsx` |
-| `Stage 1, EDA and Preprocessing Outputs/*` | `outputs/` |
-| `Stage 2 Outputs/*` | `outputs/` |
-| `Stage 3 Outputs/*` | `outputs/` |
-| `Stage 4, Impact Analysis Outputs/*` | `outputs/` |
-| `Stage 5, Agent/chromadb/` | `chromadb/` (project root) |
+Everything else (`shap_summary.json`, model artifacts, aspect dictionary, evaluation report) is already committed to the repo.
 
 ### 4. Launch
 
@@ -113,7 +94,7 @@ Double-click `local_startup.bat`, or from the project root:
 local_startup.bat
 ```
 
-Checks your `.env`, checks ChromaDB (runs Stage 5 ingestion automatically if it is missing — ~$0.30, 20–40 min), then opens the Gradio UI at **http://localhost:7860**.
+Checks your `.env`, verifies ChromaDB is present, then opens the Gradio UI at **http://localhost:7860**.
 
 ---
 
@@ -122,7 +103,7 @@ Checks your `.env`, checks ChromaDB (runs Stage 5 ingestion automatically if it 
 Requires `data/data.xlsx` from OneDrive. Skips any stage whose output files already exist.
 
 ```bash
-python scripts/run_pipeline.py              # stages 1–5, ~1-2 hours
+python scripts/run_pipeline.py              # stages 1-5, ~1-2 hours
 python scripts/run_pipeline.py --from 3    # resume from stage 3
 python scripts/run_pipeline.py --only 5    # re-run ingestion only
 ```
@@ -159,7 +140,7 @@ Runs 20 queries across all four query types, computes automatic metrics, and cal
 ## Project structure
 
 ```
-BT5153_Group_Project/
+Hotel-Review-Intelligence-.../
 │
 ├── data/
 │   └── data.xlsx                       # 515k hotel reviews (download from OneDrive)
@@ -192,27 +173,27 @@ BT5153_Group_Project/
 │   │       └── state_manager.py        # appends turn to conversation history
 │   │
 │   └── ui/
-│       └── app.py                      # Gradio chatbot (Module D)
+│       └── app.py                      # Gradio chatbot
 │
 ├── scripts/
-│   ├── run_pipeline.py                 # end-to-end pipeline orchestrator (stages 1–5)
+│   ├── run_pipeline.py                 # end-to-end pipeline orchestrator (stages 1-5)
 │   └── eval_agent.py                   # agent evaluation: 20 queries + GPT-4o judge
 │
-├── outputs/                            # all pipeline artifacts (large files on OneDrive)
-│   ├── sentences.csv                   # ~836k split sentences (Stage 1)
-│   ├── clean_reviews_stage1.csv        # cleaned review text (Stage 1)
-│   ├── aspect_dictionary.json          # LDA keyword → aspect mapping (Stage 2)
-│   ├── aspect_sentences.csv            # sentence-level aspect + sentiment labels (Stage 3)
-│   ├── review_features.csv             # review-level feature matrix (Stage 3)
-│   ├── shap_summary.json               # per-hotel + global SHAP rankings (Stage 4)
-│   ├── evaluation_report.json          # model RMSE/MAE/R² + SHAP stability (Stage 4)
-│   ├── hotel_names.json                # hotel name list for fuzzy matching (Stage 5)
+├── outputs/                            # pipeline artifacts (committed to repo where small)
+│   ├── sentences.csv                   # ~836k split sentences — download from OneDrive
+│   ├── clean_reviews_stage1.csv        # cleaned review text — download from OneDrive
+│   ├── aspect_dictionary.json          # LDA keyword → aspect mapping (in repo)
+│   ├── aspect_sentences.csv            # sentence-level aspect + sentiment — OneDrive
+│   ├── review_features.csv             # review-level feature matrix — OneDrive
+│   ├── shap_summary.json               # per-hotel + global SHAP rankings (in repo)
+│   ├── evaluation_report.json          # model RMSE/MAE/R² + SHAP stability (in repo)
+│   ├── hotel_names.json                # hotel name list for fuzzy matching (in repo)
 │   ├── agent_eval_results.json         # output of eval_agent.py
 │   └── model_artifacts/
-│       ├── linear_model.pkl
-│       └── xgb_model.pkl
+│       ├── linear_model.pkl            # (in repo)
+│       └── xgb_model.pkl               # (in repo)
 │
-├── chromadb/                           # ChromaDB vector store (~5.5 GB, on OneDrive)
+├── chromadb/                           # ChromaDB vector store (~5.5 GB, download from OneDrive)
 │   ├── evidence_store                  # ~735k embedded review sentences
 │   └── summary_store                   # ~1,493 SHAP hotel narratives
 │
