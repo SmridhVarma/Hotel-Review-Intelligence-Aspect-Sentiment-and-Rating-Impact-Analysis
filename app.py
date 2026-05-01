@@ -1,12 +1,7 @@
-"""
-app.py — Hugging Face Spaces entry point
-
-Launches the Hotel Review Intelligence Gradio UI.
-The hotel dropdown is filtered to only show hotels present in
-outputs/hotel_names.json (the demo subset for this Space).
-
-Set OPENAI_API_KEY as a Space Secret in the HF Spaces settings.
-"""
+# app.py — Module D (UI): HF Spaces entry point; launches the Gradio UI with the demo hotel subset.
+#
+# Input:  outputs/hotel_names.json, chromadb_demo/ or demo_vectors/ (numpy fallback)
+# Output: None (serves Gradio UI)
 
 from __future__ import annotations
 

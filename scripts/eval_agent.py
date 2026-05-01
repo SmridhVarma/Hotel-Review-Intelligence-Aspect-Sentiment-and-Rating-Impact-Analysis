@@ -1,11 +1,7 @@
-"""
-Module C Evaluation Script
-Usage: python scripts/eval_agent.py
-
-Runs 20 queries through the live agent, computes automatic metrics,
-then uses GPT-4o as a judge for relevance and context accuracy.
-Results saved to outputs/agent_eval_results.csv and printed to stdout.
-"""
+# eval_agent.py — Stage 5 utility | Module C (Agent): Runs 20 queries through the live agent and evaluates responses using automatic metrics and GPT-4o as judge.
+#
+# Input:  Live agent (requires OPENAI_API_KEY)
+# Output: outputs/agent_eval_results.csv
 
 import json
 import os

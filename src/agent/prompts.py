@@ -1,9 +1,7 @@
-"""
-All LangChain prompt templates used by agent nodes.
-
-Keeping prompts here means wording can be iterated without touching node
-logic or graph wiring. Each template is imported by the node that uses it.
-"""
+# prompts.py — Stage 5 | Module C (Agent): LangChain prompt templates for all agent nodes; centralised so wording can be changed without touching node logic.
+#
+# Input:  None (imported by node files)
+# Output: None
 
 from langchain_core.prompts import ChatPromptTemplate
 

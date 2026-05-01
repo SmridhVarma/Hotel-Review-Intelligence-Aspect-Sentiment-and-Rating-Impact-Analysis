@@ -1,15 +1,7 @@
-"""
-Node: segment_filter
-
-Detects a reviewer segment from the query text. Runs after query_classifier —
-if the classifier already extracted a segment, this node passes it through.
-If not, keyword detection is used as a fallback.
-
-segment=None downstream means "no filter applied".
-
-Reads:  query, segment
-Writes: segment
-"""
+# segment_filter.py — Stage 5 | Module C (Agent): Detects reviewer segment from query; passes through classifier result or falls back to keyword detection.
+#
+# Input:  AgentState — query, segment
+# Output: AgentState — segment
 
 from __future__ import annotations
 

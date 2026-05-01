@@ -1,42 +1,7 @@
-# sentiment_assignment.py — Stage 3: Aspect-Level Sentiment Assignment
+# sentiment_assignment.py — Stage 3 | Module A (ABSA): Keyword-matches sentences to aspects and assigns sentiment; aggregates to a review-level feature matrix.
 #
-# Purpose:
-#   Keyword-matches each sentence to an aspect, then assigns sentiment
-#   from source polarity. Produces both a sentence-level labeled dataset
-#   and a review-level feature matrix for downstream modeling.
-#
-# Input:
-#   outputs/sentences.csv
-#     review_id        (int)  : review identifier
-#     hotel_name       (str)  : hotel identifier
-#     sentence         (str)  : sentence text
-#     source_polarity  (str)  : "positive" | "negative"
-#     reviewer_segment (str)  : guest segment
-#     reviewer_score   (float): numeric rating
-#
-#   outputs/aspect_dictionary.json
-#     Schema: { "aspects": { aspect_name: [keyword, ...] } }
-#
-# Output:
-#   outputs/aspect_sentences.csv
-#     review_id        (int)  : review identifier
-#     hotel_name       (str)  : hotel identifier
-#     sentence         (str)  : sentence text
-#     aspect           (str)  : matched aspect (Title-Cased) e.g. "Cleanliness"
-#     sentiment        (str)  : "Positive" | "Negative" | "Neutral"
-#     reviewer_segment (str)  : guest segment
-#     reviewer_score   (float): numeric rating
-#
-#   outputs/review_features.csv
-#     review_id      (int)  : review identifier
-#     hotel_name     (str)  : hotel identifier
-#     reviewer_score (float): numeric rating — prediction target for model.py
-#     cleanliness    (float): mean aspect sentiment across sentences  (+1 / -1 / 0)
-#     staff          (float): mean aspect sentiment across sentences
-#     location       (float): mean aspect sentiment across sentences
-#     noise          (float): mean aspect sentiment across sentences
-#     food           (float): mean aspect sentiment across sentences
-#     room           (float): mean aspect sentiment across sentences
+# Input:  outputs/sentences.csv, outputs/aspect_dictionary.json
+# Output: outputs/aspect_sentences.csv, outputs/review_features.csv
 
 import os
 import sys

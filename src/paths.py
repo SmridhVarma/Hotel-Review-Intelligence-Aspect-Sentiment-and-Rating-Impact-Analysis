@@ -1,12 +1,7 @@
-# paths.py — Canonical pipeline file paths
+# paths.py — Shared: Canonical file path constants for all pipeline stages.
 #
-# Single source of truth for all input/output paths.
-# Import this module from any stage file:
-#
-#   import sys, os
-#   _SRC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-#   if _SRC not in sys.path: sys.path.insert(0, _SRC)
-#   from paths import SENTENCES, ASPECT_DICTIONARY   # etc.
+# Input:  None (imported by all stage and script files)
+# Output: None
 
 import os
 

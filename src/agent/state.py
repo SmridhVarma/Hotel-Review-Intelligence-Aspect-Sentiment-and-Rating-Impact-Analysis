@@ -1,12 +1,7 @@
-"""
-Shared conversation state for the LangGraph DAG.
-
-Every node reads from and writes to this TypedDict. Centralising it here
-avoids circular imports and duplicated type definitions across node files.
-
-conversation_history uses operator.add so LangGraph appends each turn's
-entry rather than overwriting the list.
-"""
+# state.py — Stage 5 | Module C (Agent): Defines the shared AgentState TypedDict; the single source of truth for all LangGraph node reads and writes.
+#
+# Input:  None (imported by all node files and graph.py)
+# Output: None
 
 from __future__ import annotations
 

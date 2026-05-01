@@ -1,35 +1,7 @@
-"""
-One-off fix: remove noisy LDA words from the `staff` and `food` aspects
-in outputs/aspect_dictionary.json.
-
-Why this script exists
-----------------------
-The fix_cleanliness_noise.py script already corrected cleanliness and noise.
-Staff and food were left unchanged, but their LDA topics were also noisy:
-
-  Staff (LDA Topic 2): top words included "room", "rooms", "check", "didn",
-    "like", "wifi", "booking", "asked", "wasn", "morning", "pool", "booked",
-    "people", "pay", "early", "door", "don" — generic interaction/booking
-    vocabulary, not staff-quality signal. Critically, "room" and "rooms" are
-    claimed by staff before the room aspect (first-seen-wins in
-    build_keyword_index), so sentences like "the room was spacious" get
-    mis-classified as staff.
-
-  Food (LDA Topic 3): top words included "staff", "service", "lovely",
-    "amazing", "excellent", "loved", "best", "view", "fantastic", "free",
-    "welcoming", "beautiful", "wonderful", "area", "reception" — generic
-    praise vocabulary. These words either already belong to other aspects
-    or add noise without food signal.
-
-What this script does
----------------------
-Strips the noisy LDA words from staff and food, keeping only the
-seed-derived keywords that have clear aspect signal. Other four aspects
-are left unchanged.
-
-Run from the repo root:
-    python scripts/fix_staff_food.py
-"""
+# fix_staff_food.py — Stage 2/3 one-off fix | Module A (ABSA): Removes noisy LDA words from the staff and food keyword lists in aspect_dictionary.json.
+#
+# Input:  outputs/aspect_dictionary.json
+# Output: outputs/aspect_dictionary.json (updated in-place)
 
 from __future__ import annotations
 

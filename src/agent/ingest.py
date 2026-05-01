@@ -1,28 +1,7 @@
-"""
-Stage 5: ChromaDB Ingestion
-
-Embeds all review sentences and SHAP summaries into a local ChromaDB instance
-for retrieval by the LangGraph agent. Run once after the full pipeline completes.
-Resume-safe — skips IDs already present in each collection.
-
-Usage:
-    python -m src.agent.ingest
-
-Collections:
-    evidence_store  — ~735k sentence-level documents
-                      metadata: hotel_name, aspect, sentiment, reviewer_segment,
-                                reviewer_score
-                      used by: evidence_retriever node
-
-    summary_store   — ~1,493 SHAP narrative documents (one per hotel + __global__)
-                      metadata: hotel_name, review_count, insufficient_data
-                      used by: summary_retriever node
-
-Cost estimate:
-    ~735k sentences × ~20 tokens avg = ~14.7M tokens
-    text-embedding-3-small at $0.02/1M tokens ≈ $0.30
-    Runtime: ~20–40 min depending on OpenAI rate limits.
-"""
+# ingest.py — Stage 5 | Module C (Agent): Embeds aspect sentences and SHAP summaries into ChromaDB for retrieval by the LangGraph agent. Run once after the full pipeline.
+#
+# Input:  outputs/aspect_sentences.csv, outputs/shap_summary.json
+# Output: chromadb/ (evidence_store ~735k docs, summary_store ~1493 docs), outputs/hotel_names.json
 
 from __future__ import annotations
 

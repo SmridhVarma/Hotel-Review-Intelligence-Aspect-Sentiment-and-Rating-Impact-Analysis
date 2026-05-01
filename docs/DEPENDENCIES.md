@@ -5,14 +5,14 @@ Refer this for assigned tasks and downstream files/outputs needed!
 
 | Stage | Script | Inputs | Outputs | Owner |
 |---|---|---|---|---|
-| 1 | `src/absa/preprocess.py` | `data/data.xlsx` | `outputs/sentences.csv` `outputs/clean_reviews_stage1.csv` | Module A |
-| 2 | `src/absa/aspect_extraction.py` | `outputs/sentences.csv` | `outputs/aspect_dictionary.json` | Module A |
-| 3 | `src/absa/sentiment_assignment.py` | `outputs/sentences.csv` `outputs/aspect_dictionary.json` | `outputs/aspect_sentences.csv` `outputs/review_features.csv` | Module A |
-| 4 | `src/rating_impact/model.py` | `outputs/review_features.csv` | `outputs/model_artifacts/linear_model.pkl` `outputs/model_artifacts/xgb_model.pkl` `outputs/shap_summary.json` `outputs/impact_report.csv` | Module B |
-| 4 | `src/rating_impact/evaluate.py` | `outputs/review_features.csv` `outputs/model_artifacts/*.pkl` | `outputs/evaluation_report.json` | Module B |
-| 5 | `src/agent/ingest.py` | `outputs/aspect_sentences.csv` `outputs/shap_summary.json` | `chromadb/evidence_store` `chromadb/summary_store` `outputs/hotel_names.json` | Module C |
-| 6 | `src/agent/graph.py` + `nodes/` | `chromadb/` (via ChromaDB client) | agent responses + citations | Module C |
-| UI | `src/ui/app.py` | `src/agent/graph.py` (imported) | Gradio interface at `localhost:7860` | Module D |
+| 1 | `src/absa/preprocess.py` | `data/data.xlsx` | `outputs/sentences.csv` `outputs/clean_reviews_stage1.csv` | Frankie Yang Lin |
+| 2 | `src/absa/aspect_extraction.py` | `outputs/sentences.csv` | `outputs/aspect_dictionary.json` | Lu Qianqian |
+| 3 | `src/absa/sentiment_assignment.py` | `outputs/sentences.csv` `outputs/aspect_dictionary.json` | `outputs/aspect_sentences.csv` `outputs/review_features.csv` | Wang Mengyu |
+| 4 | `src/rating_impact/model.py` | `outputs/review_features.csv` | `outputs/model_artifacts/linear_model.pkl` `outputs/model_artifacts/xgb_model.pkl` `outputs/shap_summary.json` `outputs/impact_report.csv` | Siddarth Mahesh |
+| 4 | `src/rating_impact/evaluate.py` | `outputs/review_features.csv` `outputs/model_artifacts/*.pkl` | `outputs/evaluation_report.json` | Siddarth Mahesh |
+| 5 | `src/agent/ingest.py` | `outputs/aspect_sentences.csv` `outputs/shap_summary.json` | `chromadb/evidence_store` `chromadb/summary_store` `outputs/hotel_names.json` | Smridh Varma, Mark Dodoo |
+| 5 (runtime) | `src/agent/graph.py` + `nodes/` | `chromadb/` (via ChromaDB client) | agent responses + citations | Smridh Varma, Mark Dodoo |
+| UI | `src/ui/app.py` | `src/agent/graph.py` (imported) | Gradio interface at `localhost:7860` | Smridh Varma |
 
 ## Cross-module file contracts
 

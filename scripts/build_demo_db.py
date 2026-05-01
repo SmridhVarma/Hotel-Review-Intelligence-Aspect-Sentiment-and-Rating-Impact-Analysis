@@ -1,15 +1,7 @@
-"""
-scripts/build_demo_db.py — Build a demo-sized ChromaDB for HF Spaces deployment.
-
-Reads the full chromadb/ (5.5 GB), extracts the top N hotels by sentence count,
-and writes a lightweight chromadb_demo/ (~300-500 MB depending on N).
-
-All embeddings are copied directly — no re-embedding, no API cost.
-
-Usage:
-    python scripts/build_demo_db.py             # top 50 hotels (default)
-    python scripts/build_demo_db.py --hotels 30
-"""
+# build_demo_db.py — Stage 5 utility | Module C (Agent): Builds a lightweight demo ChromaDB by copying the top N hotels from the full DB (no re-embedding, no API cost).
+#
+# Input:  chromadb/ (~5.5 GB full DB)
+# Output: chromadb_demo/ (lightweight subset, ~300–500 MB)
 
 from __future__ import annotations
 
@@ -95,6 +87,8 @@ def build_demo_db(n_hotels: int = 50) -> None:
 
     # ── Copy evidence_store ──────────────────────────────────────────────────
     print(f"\nCopying evidence_store for {n_hotels} hotels ...")
+    UPSERT_BATCH = 5000
+
     dst_ev = dst_client.create_collection(
         name="evidence_store",
         metadata={"hnsw:space": "cosine"},
@@ -104,15 +98,20 @@ def build_demo_db(n_hotels: int = 50) -> None:
             where={"hotel_name": hotel},
             include=["documents", "metadatas", "embeddings"],
         )
-        if result["ids"]:
+        ids, docs, metas, embeds = (
+            result["ids"], result["documents"],
+            result["metadatas"], result["embeddings"],
+        )
+        for start in range(0, len(ids), UPSERT_BATCH):
+            end = start + UPSERT_BATCH
             dst_ev.upsert(
-                ids=result["ids"],
-                documents=result["documents"],
-                metadatas=result["metadatas"],
-                embeddings=result["embeddings"],
+                ids=ids[start:end],
+                documents=docs[start:end],
+                metadatas=metas[start:end],
+                embeddings=embeds[start:end],
             )
-        print(f"  [{i + 1:>2}/{n_hotels}] {hotel[:60]:60s}  {len(result['ids']):>5} docs", end="\r")
-    print(f"\n  evidence_store done: {dst_ev.count():,} documents.")
+        print(f"  [{i + 1:>2}/{n_hotels}] {hotel[:60]:60s}  {len(ids):>5} docs")
+    print(f"  evidence_store done: {dst_ev.count():,} documents.")
 
     # ── Copy summary_store ───────────────────────────────────────────────────
     print(f"\nCopying summary_store ...")
@@ -149,9 +148,9 @@ def build_demo_db(n_hotels: int = 50) -> None:
     print(f"\nDone.  Demo DB: {DEMO_DB_DIR}")
     print(
         "\nNext steps for HF Spaces deployment:\n"
-        "  1. Rename chromadb_demo/ → chromadb/ in your Space repo\n"
-        "  2. Rename outputs/hotel_names_demo.json → outputs/hotel_names.json in Space repo\n"
-        "  3. See README for full deployment instructions"
+        "  1. Copy chromadb_demo/ as chromadb/ into your Space repo\n"
+        "  2. Copy outputs/hotel_names_demo.json as outputs/hotel_names.json in Space repo\n"
+        "  3. Push to HF Spaces with git lfs"
     )
 
 

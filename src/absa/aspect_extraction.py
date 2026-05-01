@@ -1,30 +1,7 @@
-"""
-Stage 2: Aspect Vocabulary Extraction via LDA Topic Modeling
-============================================================
-
-Trains a 6-topic LDA model on the Stage 1 sentence corpus to surface
-keyword vocabularies for the six predefined hotel aspects:
-    cleanliness, staff, location, noise, food, room.
-
-Pipeline:
-    sentences.csv  --> clean & lemmatize  --> CountVectorizer DTM
-                  --> LDA (n_components=6) --> top-N words per topic
-                  --> manual topic->aspect mapping (operator step)
-                  --> outputs/aspect_dictionary.json
-
-Run:
-    python -m src.absa.aspect_extraction \\
-        --input outputs/sentences.csv \\
-        --output outputs/aspect_dictionary.json
-
-The script runs in two phases:
-    Phase A (--phase fit):    fit LDA, dump top words for human review.
-    Phase B (--phase finalize): apply the human mapping, write JSON.
-A combined --phase all mode runs both back-to-back when the mapping
-in TOPIC_TO_ASPECT is already filled in.
-
-Author: Group 16, BT5153
-"""
+# aspect_extraction.py — Stage 2 | Module A (ABSA): Trains a 6-topic LDA model on the sentence corpus to produce keyword vocabularies for each hotel aspect.
+#
+# Input:  outputs/sentences.csv
+# Output: outputs/aspect_dictionary.json
 
 from __future__ import annotations
 

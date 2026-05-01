@@ -1,14 +1,7 @@
-"""
-Node: query_classifier
-
-First node in the DAG. Classifies the incoming query into structured fields
-using GPT-4o with Pydantic validation. Also resolves the hotel name via fuzzy
-matching against the known hotel list.
-
-Reads:  query, hotel_name, conversation_history
-Writes: query_type, query_direction, aspects, segment,
-        hotel_name, hotel_confidence, hotel_unresolved
-"""
+# query_classifier.py — Stage 5 | Module C (Agent): First DAG node; classifies the query and resolves hotel name via fuzzy match.
+#
+# Input:  AgentState — query, hotel_name, conversation_history
+# Output: AgentState — query_type, query_direction, aspects, segment, hotel_name, hotel_confidence, hotel_unresolved
 
 from __future__ import annotations
 

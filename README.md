@@ -100,15 +100,30 @@ Checks your `.env`, verifies ChromaDB is present, then opens the Gradio UI at **
 
 ## Running the full pipeline from scratch
 
-Requires `data/data.xlsx` from OneDrive. Skips any stage whose output files already exist.
+### 1. Download required files from OneDrive
+
+From the shared OneDrive folder, download the following and place them as shown:
+
+| File | OneDrive path | Place at |
+|---|---|---|
+| Raw dataset | `data.xlsx` | `data/data.xlsx` |
+| Stage 1 outputs *(optional — skip to resume from Stage 2/3)* | `Stage 1/sentences.csv`, `clean_reviews_stage1.csv` | `outputs/` |
+| Stage 3 outputs *(optional — skip to resume from Stage 4/5)* | `Stage 3/aspect_sentences.csv`, `review_features.csv` | `outputs/` |
+| ChromaDB *(optional — skip to resume from Stage 5 runtime)* | `Stage 5, Agent/chromadb/` | `chromadb/` |
+
+To run all five stages end to end, only `data/data.xlsx` is required. Download the intermediate outputs only if you want to skip earlier stages.
+
+### 2. Run the pipeline
 
 ```bash
-python scripts/run_pipeline.py              # stages 1-5, ~1-2 hours
-python scripts/run_pipeline.py --from 3    # resume from stage 3
-python scripts/run_pipeline.py --only 5    # re-run ingestion only
+python scripts/run_pipeline.py              # full pipeline, stages 1-5 (~1-2 hours)
+python scripts/run_pipeline.py --from 3     # resume from stage 3
+python scripts/run_pipeline.py --only 5     # re-run ingestion only
 ```
 
-Then launch:
+Each stage skips automatically if its output files already exist.
+
+### 3. Launch
 
 ```bash
 local_startup.bat
@@ -124,7 +139,7 @@ ChromaDB must be populated and `.env` must have a valid API key.
 python scripts/eval_agent.py
 ```
 
-Runs 20 queries across all four query types, computes automatic metrics, and calls GPT-4o as a judge for relevance and context accuracy. Results go to `outputs/agent_eval_results.json`.
+Runs 20 queries across all four query types, computes automatic metrics, and calls GPT-4o as a judge for relevance and context accuracy. Results go to `outputs/agent_eval_results.csv`.
 
 ```
 === Module C Evaluation Summary ===
@@ -143,7 +158,7 @@ Runs 20 queries across all four query types, computes automatic metrics, and cal
 Hotel-Review-Intelligence-.../
 │
 ├── data/
-│   └── data.xlsx                       # 515k hotel reviews (download from OneDrive)
+│   └── data.xlsx                       # 515k hotel reviews — download from OneDrive ↓
 │
 ├── src/
 │   ├── paths.py                        # single source of truth for all file paths
@@ -162,6 +177,7 @@ Hotel-Review-Intelligence-.../
 │   │   ├── state.py                    # AgentState TypedDict shared across all nodes
 │   │   ├── prompts.py                  # all LLM prompt templates
 │   │   ├── ingest.py                   # Stage 5: embed sentences into ChromaDB
+│   │   ├── npy_store.py                # numpy ChromaDB drop-in for HF Spaces
 │   │   └── nodes/
 │   │       ├── query_classifier.py     # GPT-4o: classifies query type, fuzzy hotel match
 │   │       ├── segment_filter.py       # extracts reviewer segment (Business, Couple, etc.)
@@ -177,23 +193,31 @@ Hotel-Review-Intelligence-.../
 │
 ├── scripts/
 │   ├── run_pipeline.py                 # end-to-end pipeline orchestrator (stages 1-5)
-│   └── eval_agent.py                   # agent evaluation: 20 queries + GPT-4o judge
+│   ├── eval_agent.py                   # agent evaluation: 20 queries + GPT-4o judge
+│   ├── build_demo_db.py                # build lightweight ChromaDB subset for HF Spaces
+│   ├── export_demo_vectors.py          # export demo ChromaDB to numpy for HF Spaces
+│   ├── fix_cleanliness_noise.py        # one-off: re-curate cleanliness + noise keywords
+│   ├── fix_staff_food.py               # one-off: remove noisy LDA words from staff + food
+│   ├── check_chroma.py                 # utility: inspect ChromaDB state
+│   ├── reset_chroma.py                 # utility: delete empty collections before re-ingest
+│   └── mermaid_diagram_generator.py    # regenerate pipeline + agent DAG diagrams
 │
-├── outputs/                            # pipeline artifacts (committed to repo where small)
-│   ├── sentences.csv                   # ~836k split sentences — download from OneDrive
-│   ├── clean_reviews_stage1.csv        # cleaned review text — download from OneDrive
+├── outputs/
+│   ├── sentences.csv                   # ~836k sentences — download from OneDrive ↓ (Stage 1 out)
+│   ├── clean_reviews_stage1.csv        # cleaned review-level table — download from OneDrive ↓
+│   ├── aspect_sentences.csv            # labelled sentences — download from OneDrive ↓ (Stage 3 out)
+│   ├── review_features.csv             # per-review feature matrix — download from OneDrive ↓ (Stage 3 out)
 │   ├── aspect_dictionary.json          # LDA keyword → aspect mapping (in repo)
-│   ├── aspect_sentences.csv            # sentence-level aspect + sentiment — OneDrive
-│   ├── review_features.csv             # review-level feature matrix — OneDrive
 │   ├── shap_summary.json               # per-hotel + global SHAP rankings (in repo)
 │   ├── evaluation_report.json          # model RMSE/MAE/R² + SHAP stability (in repo)
 │   ├── hotel_names.json                # hotel name list for fuzzy matching (in repo)
-│   ├── agent_eval_results.json         # output of eval_agent.py
+│   ├── agent_eval_results.csv          # output of eval_agent.py (in repo)
+│   ├── validation_sample.csv           # 100-sentence manual annotation for Module A eval (in repo)
 │   └── model_artifacts/
 │       ├── linear_model.pkl            # (in repo)
 │       └── xgb_model.pkl               # (in repo)
 │
-├── chromadb/                           # ChromaDB vector store (~5.5 GB, download from OneDrive)
+├── chromadb/                           # ChromaDB vector store — download from OneDrive ↓ (~5.5 GB)
 │   ├── evidence_store                  # ~735k embedded review sentences
 │   └── summary_store                   # ~1,493 SHAP hotel narratives
 │
@@ -203,13 +227,14 @@ Hotel-Review-Intelligence-.../
 │   └── 03_evaluation_metrics.ipynb     # Module A and B evaluation
 │
 ├── docs/
-│   ├── refs.bib                        # BibTeX references
-│   ├── report_draft.md                 # report write-up
-│   ├── architecture.md                 # pipeline and agent design detail
-│   ├── dependencies.md                 # library choices and versions
+│   ├── ARCHITECTURE.md                 # pipeline and agent design detail (with Mermaid diagrams)
+│   ├── DEPENDENCIES.md                 # stage map with owners and file contracts
+│   ├── EVALUATION_DETAILS.md           # per-module evaluation methodology and results
+│   ├── LINKS.md                        # live demo, OneDrive, and video links
 │   └── figures/                        # all report and README figures
 │
 ├── tests/                              # test stubs for all three modules
+├── app.py                              # HF Spaces entry point (launches Gradio UI)
 ├── .env.example                        # template — copy to .env, add OPENAI_API_KEY
 ├── requirements.txt
 └── local_startup.bat                   # Windows launcher: env check → ChromaDB → UI

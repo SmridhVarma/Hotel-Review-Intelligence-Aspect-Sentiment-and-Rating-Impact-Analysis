@@ -1,3 +1,8 @@
+# evaluate.py — Stage 4 | Module B (Rating Impact): Evaluates trained models with MSE/MAE/R² metrics and writes an evaluation report.
+#
+# Input:  outputs/review_features.csv, outputs/model_artifacts/linear_model.pkl, outputs/model_artifacts/xgb_model.pkl
+# Output: outputs/evaluation_report.json
+
 import os
 import sys
 import json

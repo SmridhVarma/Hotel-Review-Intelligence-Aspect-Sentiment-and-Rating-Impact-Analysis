@@ -1,24 +1,7 @@
-"""
-Node: hyde_expander
-
-Implements Hypothetical Document Embeddings (HyDE).
-
-Instead of embedding the raw user query, this node prompts GPT-4o to write
-what an ideal review-based answer would look like, then embeds that text.
-The embedding is used for ChromaDB similarity search.
-
-Why HyDE works: the hypothetical answer is stylistically similar to actual
-review sentences (both are statement-form past-tense text). A raw query
-("what do guests say about noise?") and a review sentence live in different
-parts of embedding space; a hypothetical answer sits much closer.
-
-Neutral queries generate three hypotheticals (positive / negative / neutral
-tone) sequentially, giving the retriever three different entry points for
-stratified sampling.
-
-Reads:  query, hotel_name, query_direction
-Writes: hyde_hypotheticals, hyde_embeddings
-"""
+# hyde_expander.py — Stage 5 | Module C (Agent): Generates hypothetical review snippets via GPT-4o and embeds them for ChromaDB retrieval (HyDE).
+#
+# Input:  AgentState — query, hotel_name, query_direction
+# Output: AgentState — hyde_hypotheticals, hyde_embeddings
 
 from __future__ import annotations
 

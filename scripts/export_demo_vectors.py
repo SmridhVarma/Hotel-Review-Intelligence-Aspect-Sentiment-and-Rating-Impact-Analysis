@@ -1,18 +1,7 @@
-"""
-scripts/export_demo_vectors.py — Export chromadb_demo to numpy for HF Spaces.
-
-Reads chromadb_demo/ (built by build_demo_db.py) and writes demo_vectors/:
-    demo_vectors/
-    ├── evidence_embeddings.npy   # (N, 1536) float32  — ~177 MB
-    ├── evidence_meta.json        # [{id, document, metadata}, ...]
-    ├── summary_embeddings.npy    # (M, 1536) float32
-    └── summary_meta.json
-
-These files are used by src/agent/npy_store.py as a chromadb drop-in
-that requires no C++/Rust compilation — critical for HF Spaces deployment.
-
-Usage:
-    python scripts/export_demo_vectors.py
+# export_demo_vectors.py — Stage 5 utility | Module C (Agent): Exports chromadb_demo to numpy files for use by npy_store.py on HF Spaces.
+#
+# Input:  chromadb_demo/
+# Output: demo_vectors/ (evidence_store_embeddings.npy, evidence_store_meta.json, summary_store_embeddings.npy, summary_store_meta.json)
 """
 
 from __future__ import annotations

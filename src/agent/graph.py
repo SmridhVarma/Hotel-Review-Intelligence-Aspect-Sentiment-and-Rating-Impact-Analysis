@@ -1,19 +1,7 @@
-"""
-LangGraph StateGraph wiring.
-
-This file contains no business logic — it only imports node functions and
-defines edges. All routing decisions are made by node return values.
-
-Execution order:
-    query_classifier → segment_filter
-        → [conditional on query_type]
-            "prioritization" or "mismatch" → summary_retriever
-            "evidence"                      → hyde_expander → evidence_retriever
-        → context_merger → response_generator → state_manager → END
-
-MemorySaver persists state across turns per thread_id, enabling multi-turn
-conversation without re-sending history explicitly.
-"""
+# graph.py — Stage 5 | Module C (Agent): Wires the LangGraph StateGraph DAG; defines node connections and conditional routing. No business logic.
+#
+# Input:  None (imported by app.py and src/ui/app.py)
+# Output: None
 
 from __future__ import annotations
 

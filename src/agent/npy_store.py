@@ -1,23 +1,7 @@
-"""
-src/agent/npy_store.py — Numpy-backed vector store (chromadb drop-in).
-
-Used as a fallback when chromadb is not installed (e.g. HF Spaces where
-chromadb's Rust/C++ dependencies time out during compilation).
-
-Provides a minimal subset of the chromadb API used by evidence_retriever
-and summary_retriever:
-
-    client = NpyClient(path)
-    col    = client.get_collection("evidence_store")
-    col.query(query_embeddings=[...], n_results=20, where={...}, include=[...])
-    col.get(where={...}, include=[...])
-
-Data files (written by scripts/export_demo_vectors.py):
-    {path}/evidence_store_embeddings.npy   # (N, 1536) float32
-    {path}/evidence_store_meta.json        # [{id, document, metadata}, ...]
-    {path}/summary_store_embeddings.npy
-    {path}/summary_store_meta.json
-"""
+# npy_store.py — Stage 5 | Module C (Agent): Numpy-backed ChromaDB drop-in for HF Spaces where C++/Rust dependencies are unavailable.
+#
+# Input:  demo_vectors/ (evidence_store_embeddings.npy, evidence_store_meta.json, summary_store_embeddings.npy, summary_store_meta.json)
+# Output: None (provides chromadb-compatible query/get API)
 
 from __future__ import annotations
 

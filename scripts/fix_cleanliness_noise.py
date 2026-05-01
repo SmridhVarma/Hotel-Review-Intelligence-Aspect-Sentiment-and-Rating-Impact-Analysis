@@ -1,27 +1,7 @@
-"""
-One-off fix: re-curate the `cleanliness` and `noise` aspects in the
-existing aspect_dictionary.json.
-
-Why this script exists
-----------------------
-Stage 2's LDA fit produced clean topics for `location`, `food`, and `room`,
-but the topics it picked up for `cleanliness` and `noise` were noisy:
-LDA's top words for those slots were dominated by generic-praise terms
-("friendly", "helpful", "comfortable") and cross-aspect bleed ("bed",
-"bathroom"), with the actual cleanliness/noise vocabulary buried later in
-the merged list because LDA words were placed before seed words.
-
-What this script does
----------------------
-Reads outputs/aspect_dictionary.json, rebuilds `cleanliness` and `noise`
-with seed words first (so distinctive cleanliness/noise terms lead the
-list), filters out generic-praise tokens that don't belong to either
-aspect, and writes the result back. Other aspects are left untouched.
-The metadata block records what changed for transparency.
-
-Run from the repo root:
-    python scripts/fix_cleanliness_noise.py
-"""
+# fix_cleanliness_noise.py — Stage 2/3 one-off fix | Module A (ABSA): Re-curates the cleanliness and noise keyword lists to remove LDA noise and cross-aspect bleed.
+#
+# Input:  outputs/aspect_dictionary.json
+# Output: outputs/aspect_dictionary.json (updated in-place)
 
 from __future__ import annotations
 

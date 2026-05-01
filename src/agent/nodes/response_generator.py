@@ -1,20 +1,7 @@
-"""
-Node: response_generator
-
-Generates the final agent response using GPT-4o.
-
-Normal path (low_confidence=False): passes retrieved context to RESPONSE_PROMPT
-and asks GPT-4o to answer with citations.
-
-Fallback path (low_confidence=True): uses CANNOT_ANSWER_PROMPT to explain
-why the system cannot answer confidently.
-
-Also formats citations from retrieved_chunks metadata for the UI panel.
-
-Reads:  query, hotel_name, retrieved_chunks, summary_context,
-        low_confidence, hotel_unresolved, insufficient_data
-Writes: response, citations
-"""
+# response_generator.py — Stage 5 | Module C (Agent): Calls GPT-4o to generate the final response with citations; falls back to a cannot-answer message on low confidence.
+#
+# Input:  AgentState — query, hotel_name, retrieved_chunks, summary_context, low_confidence, hotel_unresolved, insufficient_data
+# Output: AgentState — response, citations
 
 from __future__ import annotations
 

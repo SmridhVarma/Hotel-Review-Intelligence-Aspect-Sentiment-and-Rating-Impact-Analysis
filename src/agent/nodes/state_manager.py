@@ -1,17 +1,7 @@
-"""
-Node: state_manager
-
-Last node in the DAG before END. Appends the current turn to
-conversation_history and updates last_topic. On topic shift (query_type
-changed from previous turn), clears the retrieval cache so the next query
-starts fresh.
-
-Reads:  query, response, query_type, last_topic, hyde_embeddings,
-        hyde_hypotheticals, retrieved_chunks
-Writes: conversation_history (appended), last_topic,
-        hyde_embeddings/hypotheticals (cleared on topic shift),
-        retrieved_chunks (cleared on topic shift)
-"""
+# state_manager.py — Stage 5 | Module C (Agent): Last DAG node; appends the turn to conversation history and clears retrieval cache on topic shift.
+#
+# Input:  AgentState — query, response, query_type, last_topic, hyde_embeddings, hyde_hypotheticals, retrieved_chunks
+# Output: AgentState — conversation_history (appended), last_topic, hyde_embeddings/hypotheticals/retrieved_chunks (cleared on topic shift)
 
 from __future__ import annotations
 

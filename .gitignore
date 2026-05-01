@@ -15,10 +15,11 @@ build/
 .eggs/
 .pytest_cache/
 
-# Data (large — add data.csv to data/ locally, do not commit)
+# Data (large — download locally from OneDrive, do not commit)
 data/*.csv
 data/*.json
 data/*.parquet
+data/*.xlsx
 
 # Large pipeline outputs
 outputs/model_artifacts/*.pkl
@@ -29,6 +30,8 @@ outputs/review_features.csv
 
 # ChromaDB (rebuilt from pipeline, not committed)
 chromadb/
+chromadb_demo/
+demo_vectors/
 
 # IDE
 .vscode/
@@ -57,5 +60,11 @@ docs/issues_inconsistencies.md
 tests/
 presentation/
 
+# Windows crash dumps
+bash.exe.stackdump
+*.stackdump
+
+# Demo build artifacts (local only)
+outputs/hotel_names_demo.json
 
 notebooks/data.csv

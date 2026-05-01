@@ -1,23 +1,7 @@
-"""
-Node: context_merger
-
-Combines retrieved_chunks and summary_context into a formatted context string
-for the response generator.
-
-Sets low_confidence=True only for genuine hard failures:
-  - hotel name could not be resolved
-  - both evidence and summary are empty (nothing to work with)
-
-Similarity scores are intentionally NOT used as a confidence gate.
-text-embedding-3-small scores are ranking metrics, not absolute quality
-signals — broad queries naturally score lower, but the retrieved content
-is still useful. The response_generator's RESPONSE_PROMPT handles uncertainty
-naturally via GPT-4o hedging.
-
-Reads:  retrieved_chunks, summary_context, hotel_unresolved, insufficient_data
-Writes: low_confidence
-        (retrieved_chunks and summary_context are read, not modified)
-"""
+# context_merger.py — Stage 5 | Module C (Agent): Merges retrieved chunks and SHAP summary into a formatted context string; sets low_confidence on hard failures.
+#
+# Input:  AgentState — retrieved_chunks, summary_context, hotel_unresolved, insufficient_data
+# Output: AgentState — low_confidence
 
 from __future__ import annotations
 

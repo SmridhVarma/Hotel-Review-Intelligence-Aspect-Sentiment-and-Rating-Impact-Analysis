@@ -1,8 +1,12 @@
-"""Reset ChromaDB - delete the empty evidence_store so ingest starts cleanly."""
+# reset_chroma.py — Stage 5 utility | Module C (Agent): Deletes any empty ChromaDB collections so re-ingest can start cleanly.
+#
+# Input:  chromadb/
+# Output: chromadb/ (empty collections removed)
 import chromadb
 import os
 
-db_dir = os.path.join(os.path.dirname(__file__), "chromadb")
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+db_dir = os.path.join(_ROOT, "chromadb")
 client = chromadb.PersistentClient(path=db_dir)
 
 for col in client.list_collections():

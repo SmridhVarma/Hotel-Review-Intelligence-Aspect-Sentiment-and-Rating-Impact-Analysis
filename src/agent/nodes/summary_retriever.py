@@ -1,14 +1,7 @@
-"""
-Node: summary_retriever
-
-Retrieves the SHAP-based impact narrative for the selected hotel (or
-__global__) from ChromaDB summary_store. Used for prioritization queries.
-
-Uses collection.get() — no embedding needed, just a metadata filter lookup.
-
-Reads:  hotel_name
-Writes: summary_context, insufficient_data
-"""
+# summary_retriever.py — Stage 5 | Module C (Agent): Fetches the SHAP impact narrative for the selected hotel from ChromaDB summary_store.
+#
+# Input:  AgentState — hotel_name
+# Output: AgentState — summary_context, insufficient_data
 
 from __future__ import annotations
 

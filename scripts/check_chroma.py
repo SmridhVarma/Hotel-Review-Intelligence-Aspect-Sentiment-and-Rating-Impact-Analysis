@@ -1,8 +1,12 @@
-"""Quick script to inspect current ChromaDB state."""
+# check_chroma.py — Stage 5 utility | Module C (Agent): Inspects the current ChromaDB state by querying the SQLite backing store directly.
+#
+# Input:  chromadb/chroma.sqlite3
+# Output: None (prints collection stats to stdout)
 import sqlite3
 import os
 
-db_path = os.path.join("chromadb", "chroma.sqlite3")
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+db_path = os.path.join(_ROOT, "chromadb", "chroma.sqlite3")
 conn = sqlite3.connect(db_path)
 cur = conn.cursor()
 

@@ -1,21 +1,7 @@
-"""
-src/ui/app.py — Gradio Chatbot Web Interface
-
-Layout:
-    Top:    hotel dropdown
-    Left:   SHAP impact bar chart (updates on hotel change)
-    Right:  multi-turn chatbot
-    Bottom: cited review sources from last response
-
-Session memory:
-    Each browser load gets a fresh uuid4 thread_id. LangGraph's MemorySaver
-    persists state across turns within that thread. Switching hotels resets
-    the thread (new uuid4) so memory doesn't bleed across hotel contexts.
-
-Run:
-    python src/ui/app.py
-    Open http://localhost:7860
-"""
+# app.py — Module D (UI): Gradio chatbot with hotel dropdown, SHAP impact chart, multi-turn chat, and cited sources panel.
+#
+# Input:  outputs/hotel_names.json, chromadb/ (via agent graph)
+# Output: None (serves Gradio UI at localhost:7860)
 
 from __future__ import annotations
 

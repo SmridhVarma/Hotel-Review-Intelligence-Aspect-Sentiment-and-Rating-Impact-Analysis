@@ -1,37 +1,7 @@
-# preprocess.py — Stage 1: Text Preparation
+# preprocess.py — Stage 1 | Module A (ABSA): Cleans raw review text, extracts reviewer segments, and sentence-tokenises each review.
 #
-# Purpose:
-#   Loads the raw hotel review CSV, cleans positive and negative review text,
-#   extracts reviewer segment from Tags, sentence-tokenizes each review, and
-#   writes two output files consumed by the rest of the pipeline.
-#
-# Input:
-#   data/data.csv
-#     Hotel_Name       (str)  : hotel identifier
-#     Positive_Review  (str)  : guest's positive comments
-#     Negative_Review  (str)  : guest's negative comments
-#     Reviewer_Score   (float): numeric rating 0–10
-#     Tags             (str)  : trip type tags e.g. "[' Leisure trip ', ' Couple ']"
-#     Review_Date      (str)  : date of review
-#     Hotel_Address    (str)  : full hotel address
-#     Reviewer_Nationality (str): reviewer's nationality
-#
-# Output:
-#   outputs/sentences.csv          — one row per sentence (pipeline primary input)
-#     review_id        (int)  : row index from source data
-#     hotel_name       (str)  : hotel identifier (exact original string, no normalisation)
-#     reviewer_score   (float): original numeric rating
-#     reviewer_segment (str)  : Business | Couple | Family | Solo | Group | Unknown
-#     review_date      (str)  : ISO date string YYYY-MM-DD
-#     sentence         (str)  : individual sentence from review
-#     source_field     (str)  : original field name ("Positive_Review" | "Negative_Review")
-#     source_polarity  (str)  : structural polarity "positive" | "negative"
-#
-#   outputs/clean_reviews_stage1.csv  — review-level clean table (EDA / reference)
-#     review_id, Hotel_Name, Hotel_Address, Reviewer_Nationality, Review_Date,
-#     Reviewer_Score, Tags, reviewer_segment, positive_review_clean,
-#     negative_review_clean, positive_word_count, negative_word_count,
-#     total_word_count, full_review_clean
+# Input:  data/data.xlsx
+# Output: outputs/sentences.csv, outputs/clean_reviews_stage1.csv
 
 import os
 import re

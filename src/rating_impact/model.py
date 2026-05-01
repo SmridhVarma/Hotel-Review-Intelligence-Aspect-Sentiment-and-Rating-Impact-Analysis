@@ -1,3 +1,8 @@
+# model.py — Stage 4 | Module B (Rating Impact): Trains Linear Regression and XGBoost models on aspect sentiment features; computes per-hotel SHAP values.
+#
+# Input:  outputs/review_features.csv
+# Output: outputs/model_artifacts/linear_model.pkl, outputs/model_artifacts/xgb_model.pkl, outputs/shap_summary.json, outputs/impact_report.csv
+
 import os
 import sys
 import json

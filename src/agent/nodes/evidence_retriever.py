@@ -1,20 +1,7 @@
-"""
-Node: evidence_retriever
-
-Queries ChromaDB evidence_store using the HyDE embeddings from hyde_expander.
-Applies optional metadata filters for hotel_name, reviewer_segment, and
-(for directional queries) sentiment.
-
-Directional queries (positive/negative): single query, top-20 results,
-sentiment filter applied.
-
-Neutral queries: stratified retrieval — one query per hypothetical
-(positive / negative / neutral tone), top-7 each, deduplicated by sentence
-text. Guarantees the LLM sees a balanced sample of guest experience.
-
-Reads:  hyde_embeddings, hotel_name, segment, query_direction
-Writes: retrieved_chunks
-"""
+# evidence_retriever.py — Stage 5 | Module C (Agent): Retrieves review sentences from ChromaDB evidence_store using HyDE embeddings with optional metadata filters.
+#
+# Input:  AgentState — hyde_embeddings, hotel_name, segment, query_direction
+# Output: AgentState — retrieved_chunks
 
 from __future__ import annotations
 
