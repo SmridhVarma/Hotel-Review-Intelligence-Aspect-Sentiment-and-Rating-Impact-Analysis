@@ -107,8 +107,8 @@ From the shared OneDrive folder, download the following and place them as shown:
 | File | OneDrive path | Place at |
 |---|---|---|
 | Raw dataset | `data.xlsx` | `data/data.xlsx` |
-| Stage 1 outputs *(optional — skip to resume from Stage 2/3)* | `Stage 1/sentences.csv`, `clean_reviews_stage1.csv` | `outputs/` |
-| Stage 3 outputs *(optional — skip to resume from Stage 4/5)* | `Stage 3/aspect_sentences.csv`, `review_features.csv` | `outputs/` |
+| Stage 1 outputs *(optional — skip to resume from Stage 2/3)* | `Stage 1, EDA and Preprocessing Outputs/sentences.csv`, `clean_reviews_stage1.csv` | `outputs/` |
+| Stage 3 outputs *(optional — skip to resume from Stage 4/5)* | `Stage 3 Outputs/aspect_sentences.csv`, `review_features.csv` | `outputs/` |
 | ChromaDB *(optional — skip to resume from Stage 5 runtime)* | `Stage 5, Agent/chromadb/` | `chromadb/` |
 
 To run all five stages end to end, only `data/data.xlsx` is required. Download the intermediate outputs only if you want to skip earlier stages.
