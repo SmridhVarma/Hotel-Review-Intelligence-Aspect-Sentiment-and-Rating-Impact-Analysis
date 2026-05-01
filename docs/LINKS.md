@@ -9,7 +9,7 @@ https://nusu-my.sharepoint.com/:f:/g/personal/e1520494_u_nus_edu/IgDqEXnOFFgJRK0
 
 
 ## Team Presentation Video Link
-<>
+https://nusu-my.sharepoint.com/:v:/g/personal/e1520494_u_nus_edu/IQCsQol6bp3FRK-dvd5HybXpAcGL7A7y_CiXdXnUaJ_wnH8?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=XdNQG3
 
 
 ## Demo Video Link
