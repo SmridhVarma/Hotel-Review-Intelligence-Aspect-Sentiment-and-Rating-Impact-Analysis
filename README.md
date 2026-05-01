@@ -2,6 +2,8 @@
 
 **BT5153 Applied Machine Learning in Business Analytics — Group 16, NUS**
 
+Note: Check docs/LINKS.md for links to all submission deliverables and the onedrive folder.
+
 Turns 515k unstructured European hotel reviews into aspect-level sentiment signals, models which aspects drive guest ratings up or down using SHAP, and exposes it through a conversational agent hotel owners can query in plain English.
 
 ![Gradio UI](docs/figures/gradio_ui.png)
